@@ -5,6 +5,7 @@ import asyncio
 import argparse
 from typing import Optional
 from .tfs import extract_tfs_from_url, build_explore_url
+from .tfs_builder import build_tfs_from_airport_code
 from .fetch_http import fetch_html_stream
 from .fetch_browser import fetch_html_browser
 from .parse_html import parse_cards_from_html
@@ -13,6 +14,7 @@ from .parse_html import parse_cards_from_html
 async def run(
     tfs_url: Optional[str],
     tfs_blob: Optional[str],
+    origin_airport: Optional[str],
     html_file: Optional[str],
     use_browser: bool,
     hl: str,
@@ -44,11 +46,27 @@ async def run(
                 traceback.print_exc()
             sys.exit(1)
     
-    # Otherwise, fetch from URL
-    if not (tfs_url or tfs_blob) or (tfs_url and tfs_blob):
-        raise SystemExit("Provide exactly one of --tfs-url, --tfs, or --html-file")
+    # Determine the TFS parameter source
+    param_count = sum([bool(tfs_url), bool(tfs_blob), bool(origin_airport)])
+    if param_count == 0:
+        raise SystemExit("Provide one of: --origin, --tfs-url, --tfs, or --html-file")
+    if param_count > 1:
+        raise SystemExit("Provide exactly one of: --origin, --tfs-url, --tfs, or --html-file")
 
-    if tfs_url:
+    # Get TFS parameter from appropriate source
+    if origin_airport:
+        # Build TFS programmatically using protocol buffers
+        if verbose:
+            print(f"[info] Building TFS for origin: {origin_airport}", file=sys.stderr)
+        try:
+            tfs = build_tfs_from_airport_code(origin_airport)
+        except Exception as e:
+            print(f"[error] Failed to build TFS: {e}", file=sys.stderr)
+            if verbose:
+                import traceback
+                traceback.print_exc()
+            sys.exit(1)
+    elif tfs_url:
         tfs = extract_tfs_from_url(tfs_url)
     else:
         tfs = tfs_blob
@@ -90,25 +108,39 @@ async def run(
 
 def main():
     """CLI entry point."""
-    p = argparse.ArgumentParser(description="Google Travel Explore scraper (JSON)")
+    p = argparse.ArgumentParser(
+        description="Google Travel Explore scraper (JSON)",
+        epilog="Examples:\n"
+               "  %(prog)s --origin JFK --use-browser\n"
+               "  %(prog)s --origin LAX --use-browser --out results.json\n"
+               "  %(prog)s --html-file explore.html",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    # Input source (mutually exclusive)
     g = p.add_mutually_exclusive_group(required=True)
+    g.add_argument("--origin", type=str, metavar="CODE", help="Airport code (e.g., JFK, LAX, ORD) - recommended")
     g.add_argument("--tfs-url", type=str, help="Full Explore URL containing tfs=...")
     g.add_argument("--tfs", type=str, help="Raw tfs blob")
     g.add_argument("--html-file", type=str, help="Parse a saved HTML file (for JS-rendered pages)")
+    
+    # Options
     p.add_argument("--use-browser", action="store_true", help="Use Playwright to render JavaScript (required for live scraping)")
-    p.add_argument("--hl", type=str, default="en")
-    p.add_argument("--gl", type=str, default="us")
+    p.add_argument("--hl", type=str, default="en", help="Language code (default: en)")
+    p.add_argument("--gl", type=str, default="us", help="Region code (default: us)")
     p.add_argument("--proxy", type=str, default=None, help="HTTP/SOCKS proxy (format: http://host:port)")
-    p.add_argument("--max-bytes", type=int, default=16000)
+    p.add_argument("--max-bytes", type=int, default=16000, help="Max bytes to fetch (default: 16000)")
     p.add_argument("--timeout", type=float, default=30.0, help="Timeout in seconds (default: 30)")
-    p.add_argument("--out", type=str, default=None)
-    p.add_argument("--verbose", action="store_true")
+    p.add_argument("--out", type=str, default=None, help="Output JSON file (default: stdout)")
+    p.add_argument("--verbose", action="store_true", help="Verbose output")
+    
     args = p.parse_args()
 
     cards = asyncio.run(
         run(
             tfs_url=args.tfs_url,
             tfs_blob=args.tfs,
+            origin_airport=args.origin,
             html_file=args.html_file,
             use_browser=args.use_browser,
             hl=args.hl,

@@ -7,48 +7,49 @@ Extracts destination cards (name, price, dates, flight duration) from Google Tra
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+protoc --python_out=. flights.proto  # Generate protocol buffer code
 playwright install chromium
 ```
 
 ## Usage
 
-### Automated browser scraping (recommended)
+### By airport code (recommended)
 
-Uses Playwright to automate a real browser and extract fully-rendered data:
+Works with **any** IATA airport code - uses protocol buffers to generate proper Google Travel URLs:
 
 ```bash
-# Live scraping with Playwright
-python -m explore_scraper.cli \
-  --tfs-url "https://www.google.com/travel/explore?tfs=CBwQ..." \
-  --use-browser \
-  --verbose
+# Search from JFK
+python -m explore_scraper.cli --origin JFK --use-browser
 
-# Save to file
-python -m explore_scraper.cli \
-  --tfs-url "https://www.google.com/travel/explore?tfs=CBwQ..." \
-  --use-browser \
-  --out results.json
+# Search from LAX, save to file
+python -m explore_scraper.cli --origin LAX --use-browser --out results.json
+
+# Search from DFW
+python -m explore_scraper.cli --origin DFW --use-browser
 
 # With proxy
-python -m explore_scraper.cli \
-  --tfs-url "..." \
-  --use-browser \
-  --proxy "http://user:pass@IP:PORT"
+python -m explore_scraper.cli --origin ORD --use-browser --proxy "http://IP:PORT"
 ```
 
-### Parse saved HTML file (alternative)
+**Supports all IATA codes** - no manual collection or mapping needed!
 
-If you prefer to save HTML manually:
+### By full URL (alternative)
+
+If you have a specific Google Travel Explore URL:
+
+```bash
+python -m explore_scraper.cli \
+  --tfs-url "https://www.google.com/travel/explore?tfs=CBwQ..." \
+  --use-browser
+```
+
+### Parse saved HTML file (offline)
+
+Parse a previously saved HTML file:
 
 ```bash
 python -m explore_scraper.cli --html-file explore.html --out results.json
 ```
-
-**How to save HTML from browser:**
-1. Navigate to Google Travel Explore URL in Chrome/Firefox
-2. Wait for map and destinations to load
-3. Right-click → "Save Page As" → "Webpage, Complete"
-4. Use the saved HTML file with the scraper
 
 ## Output
 
@@ -113,24 +114,34 @@ explore_scraper/
 ├── __init__.py          # Package initialization
 ├── cli.py               # Command-line interface and main orchestration
 ├── tfs.py               # URL parsing and building (extracts tfs parameters)
+├── tfs_builder.py       # Programmatic TFS generation from airport codes (protobuf)
 ├── fetch_http.py        # Direct HTTP fetching (legacy, returns empty for JS pages)
 ├── fetch_browser.py     # Playwright browser automation (recommended)
 └── parse_html.py        # HTML parsing logic (extracts cards from rendered HTML)
+
+flights.proto            # Protocol Buffer definition for Google Flights data
+flights_pb2.py           # Generated Python code from flights.proto (via protoc)
+
+data/
+└── top_150_us_airports.txt  # Reference list of top 150 US airport codes
 ```
 
-## Current Status (Checkpoint)
+## Current Status
 
 **✅ Working:**
-- Playwright-based browser automation (`--use-browser`)
-- Full data extraction: destination, price, currency, dates, duration
-- Base64 decoding of embedded flight data
-- Proxy support
-- HTML file parsing fallback
-- Error handling for 0 results
+- **Airport code-based searches** (`--origin JFK`) - supports **any** IATA code worldwide
+- **Programmatic TFS parameter generation** using Protocol Buffers (no manual collection needed)
+- **Playwright-based browser automation** (`--use-browser`) for JavaScript rendering
+- **Full data extraction**: destination, price, currency, dates, duration
+- **Base64 decoding** of embedded flight data
+- **Proxy support** for both HTTP and SOCKS
+- **HTML file parsing** fallback for offline analysis
+- **Error handling** for 0 results and network failures
 
 **⚠️ Known Issues:**
-- Direct HTTP fetch without browser returns empty (by design - page requires JS)
-- Flight duration field is sometimes null (depends on Google's data)
+- Direct HTTP fetch without browser returns empty (by design - page requires JavaScript)
+- Flight duration field is sometimes null (depends on Google's data availability)
+- Browser automation requires sandbox bypass on macOS/Linux (AI tools may need permissions)
 
 **🔮 Future Enhancements:**
 - Add image URLs extraction
@@ -138,4 +149,6 @@ explore_scraper/
 - Parse airline information if available
 - Add retry logic for network failures
 - Support for multiple currencies
+- Batch mode: scrape multiple airports at once
+- Caching layer for repeated queries
 
