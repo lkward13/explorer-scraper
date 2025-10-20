@@ -3,6 +3,7 @@ import sys
 import json
 import asyncio
 import argparse
+from pathlib import Path
 from typing import Optional
 from .tfs import extract_tfs_from_url, build_explore_url
 from .tfs_builder import build_tfs_from_airport_code
@@ -15,6 +16,7 @@ async def run(
     tfs_url: Optional[str],
     tfs_blob: Optional[str],
     origin_airport: Optional[str],
+    region: Optional[str],
     html_file: Optional[str],
     use_browser: bool,
     hl: str,
@@ -55,17 +57,45 @@ async def run(
 
     # Get TFS parameter from appropriate source
     if origin_airport:
-        # Build TFS programmatically using protocol buffers
-        if verbose:
-            print(f"[info] Building TFS for origin: {origin_airport}", file=sys.stderr)
-        try:
-            tfs = build_tfs_from_airport_code(origin_airport)
-        except Exception as e:
-            print(f"[error] Failed to build TFS: {e}", file=sys.stderr)
+        # Check if region-specific TFS exists
+        if region:
+            region_file = Path(f"data/region_tfs/{origin_airport.upper()}.json")
+            if region_file.exists():
+                try:
+                    with open(region_file, 'r') as f:
+                        region_data = json.load(f)
+                    
+                    region_key = region.lower().replace(" ", "_")
+                    if region_key in region_data["regions"]:
+                        tfs = region_data["regions"][region_key]
+                        if verbose:
+                            print(f"[info] Using cached TFS for {origin_airport} → {region}", file=sys.stderr)
+                    else:
+                        print(f"[error] Region '{region}' not found in {region_file}", file=sys.stderr)
+                        print(f"[info] Available regions: {', '.join(region_data['regions'].keys())}", file=sys.stderr)
+                        sys.exit(1)
+                except Exception as e:
+                    print(f"[error] Failed to load region TFS: {e}", file=sys.stderr)
+                    if verbose:
+                        import traceback
+                        traceback.print_exc()
+                    sys.exit(1)
+            else:
+                print(f"[error] No region data found for {origin_airport}", file=sys.stderr)
+                print(f"[info] Run: python scripts/collect_regions.py --origin {origin_airport}", file=sys.stderr)
+                sys.exit(1)
+        else:
+            # Build TFS programmatically using protocol buffers (anywhere)
             if verbose:
-                import traceback
-                traceback.print_exc()
-            sys.exit(1)
+                print(f"[info] Building TFS for origin: {origin_airport} (anywhere)", file=sys.stderr)
+            try:
+                tfs = build_tfs_from_airport_code(origin_airport)
+            except Exception as e:
+                print(f"[error] Failed to build TFS: {e}", file=sys.stderr)
+                if verbose:
+                    import traceback
+                    traceback.print_exc()
+                sys.exit(1)
     elif tfs_url:
         tfs = extract_tfs_from_url(tfs_url)
     else:
@@ -124,6 +154,9 @@ def main():
     g.add_argument("--tfs", type=str, help="Raw tfs blob")
     g.add_argument("--html-file", type=str, help="Parse a saved HTML file (for JS-rendered pages)")
     
+    # Region filter (optional, only works with --origin)
+    p.add_argument("--region", type=str, help="Destination region (e.g., 'Europe', 'Asia') - requires pre-collected data")
+    
     # Options
     p.add_argument("--use-browser", action="store_true", help="Use Playwright to render JavaScript (required for live scraping)")
     p.add_argument("--hl", type=str, default="en", help="Language code (default: en)")
@@ -135,12 +168,18 @@ def main():
     p.add_argument("--verbose", action="store_true", help="Verbose output")
     
     args = p.parse_args()
-
+    
+    # Validate --region only works with --origin
+    if args.region and not args.origin:
+        print("[error] --region requires --origin to be specified", file=sys.stderr)
+        sys.exit(1)
+    
     cards = asyncio.run(
         run(
             tfs_url=args.tfs_url,
             tfs_blob=args.tfs,
             origin_airport=args.origin,
+            region=args.region,
             html_file=args.html_file,
             use_browser=args.use_browser,
             hl=args.hl,
