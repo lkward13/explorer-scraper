@@ -81,6 +81,102 @@ def build_flights_url(
     return url
 
 
+async def scrape_dom_prices(page, verbose: bool = False) -> List[Dict[str, Any]]:
+    """
+    Scrape prices directly from the visible price graph bars in the DOM.
+    This is a fallback when the API doesn't provide data for later months.
+    """
+    dom_prices = []
+    
+    try:
+        # The price graph uses SVG/canvas or div bars with data attributes
+        # Try to find all clickable date elements or bars
+        await page.wait_for_timeout(1000)  # Let DOM settle
+        
+        # Let's inspect the whole price graph HTML structure
+        debug_script = """
+        () => {
+            // Find the price graph container
+            const graphDialog = document.querySelector('[role="dialog"]');
+            if (!graphDialog) return { error: 'No dialog found' };
+            
+            // Get the HTML to inspect the structure
+            const graphHTML = graphDialog.innerHTML;
+            
+            // Look for canvas
+            const canvas = graphDialog.querySelectorAll('canvas');
+            
+            // Look for divs that might be bars (with inline styles for height)
+            const divsWithHeight = Array.from(graphDialog.querySelectorAll('div[style*="height"]')).slice(0, 5);
+            
+            // Look for month labels
+            const monthLabels = graphDialog.textContent.match(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+\\d{4}/g) || [];
+            
+            return {
+                canvasCount: canvas.length,
+                monthLabels: monthLabels.slice(0, 10),
+                divsWithHeightCount: divsWithHeight.length,
+                sample_divs: divsWithHeight.map(d => ({
+                    classes: d.className,
+                    style: d.getAttribute('style'),
+                    aria: d.getAttribute('aria-label')
+                })),
+                hasGraphText: graphHTML.includes('$') && graphHTML.includes('202')
+            };
+        }
+        """
+        
+        debug_info = await page.evaluate(debug_script)
+        if verbose:
+            print(f"[debug] DOM structure: {json.dumps(debug_info, indent=2)}", file=sys.stderr)
+        
+        # Now try to scrape actual data
+        script = """
+        () => {
+            const results = [];
+            const graphDialog = document.querySelector('[role="dialog"]');
+            if (!graphDialog) return results;
+            
+            // Look for clickable elements with aria-labels containing prices
+            const clickable = graphDialog.querySelectorAll('[role="button"], button, [tabindex], [aria-label]');
+            
+            clickable.forEach(el => {
+                const ariaLabel = el.getAttribute('aria-label') || '';
+                
+                // Pattern: contains dates and prices
+                // E.g., "Sat, Dec 6 - Sat, Dec 13 From $164" or similar
+                if (ariaLabel.includes('$') && (ariaLabel.includes('202') || ariaLabel.match(/\\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\b/))) {
+                    results.push({ 
+                        raw: ariaLabel,
+                        tag: el.tagName,
+                        role: el.getAttribute('role')
+                    });
+                }
+            });
+            
+            return results;
+        }
+        """
+        
+        dom_data = await page.evaluate(script)
+        
+        if verbose:
+            print(f"[info] DOM scraping found {len(dom_data)} price elements", file=sys.stderr)
+            if dom_data and len(dom_data) > 0:
+                print(f"[debug] Sample: {json.dumps(dom_data[0], indent=2)}", file=sys.stderr)
+        
+        for item in dom_data:
+            dom_prices.append(item)
+            
+    except Exception as e:
+        if verbose:
+            print(f"[warn] DOM scraping failed: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+    
+    return dom_prices
+
+
 async def scrape_price_graph_data(
     origin: str,
     destination: str,
@@ -90,7 +186,8 @@ async def scrape_price_graph_data(
     timeout: int = 30000
 ) -> Optional[List[Dict[str, Any]]]:
     """
-    Scrape price data from Google Flights price graph using network interception.
+    Scrape price data from Google Flights price graph using network interception
+    and DOM scraping fallback.
     
     Args:
         origin: Origin airport code
@@ -109,6 +206,7 @@ async def scrape_price_graph_data(
         print(f"[info] Navigating to: {url}", file=sys.stderr)
     
     price_data = []
+    dom_scraped_data = []  # Store DOM-scraped prices
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -219,17 +317,46 @@ async def scrape_price_graph_data(
                     if verbose:
                         print(f"[info] Loading month {month_num + 2}...", file=sys.stderr)
                     
+                    # Check if currency dialog opened accidentally and close it
+                    try:
+                        currency_dialog = await page.query_selector('text="Select your currency"')
+                        if currency_dialog:
+                            if verbose:
+                                print(f"[warn] Currency dialog opened, closing it...", file=sys.stderr)
+                            # Press Escape to close
+                            await page.keyboard.press('Escape')
+                            await page.wait_for_timeout(1000)
+                    except:
+                        pass
+                    
+                    # Get initial count of calendar graph responses
+                    initial_calendar_graph_count = len([r for r in price_data if 'GetCalendarGraph' in r['url']])
+                    
                     # Find and click the "next month" button (right arrow on price graph)
-                    # The button has class VfPpkd-LgbsSe - get the LAST one (right arrow)
+                    # The price graph has navigation buttons - find the right arrow
+                    # Let's inspect what buttons exist first
+                    if month_num == 0 and verbose:
+                        button_info = await page.evaluate("""
+                            () => {
+                                const dialog = document.querySelector('[role="dialog"]');
+                                if (!dialog) return {error: 'No dialog'};
+                                
+                                const buttons = dialog.querySelectorAll('button');
+                                return Array.from(buttons).map(b => ({
+                                    aria: b.getAttribute('aria-label'),
+                                    classes: b.className,
+                                    text: b.textContent.trim().substring(0, 30)
+                                }));
+                            }
+                        """)
+                        print(f"[debug] Buttons in dialog: {json.dumps(button_info[:10], indent=2)}", file=sys.stderr)
+                    
+                    # Try to find the right navigation button
+                    # The button has aria-label="Scroll forward"
                     next_button_selectors = [
-                        # Target the specific button class and get the last one (right arrow)
-                        'button.VfPpkd-LgbsSe.b9hyVd >> nth=-1',
-                        'button.VfPpkd-LgbsSe.MQasIc >> nth=-1',
-                        'button.VfPpkd-LgbsSe >> nth=-1',
-                        # Within the dialog
-                        'div[role="dialog"] button.VfPpkd-LgbsSe >> nth=-1',
-                        # Fallback
-                        'button:has(svg) >> nth=-1',
+                        'button[aria-label="Scroll forward"]',
+                        'button[aria-label*="Scroll forward"]',
+                        'button[aria-label*="forward"]',
                     ]
                     
                     clicked_next = False
@@ -287,6 +414,14 @@ async def scrape_price_graph_data(
                             print(f"[debug] Saved screenshot: debug_no_next_button_month_{month_num + 2}.png", file=sys.stderr)
                         break
             
+            # After ALL pagination is done, scrape visible bars from DOM as fallback
+            if verbose:
+                print(f"[info] Pagination complete. Scraping visible price bars from DOM...", file=sys.stderr)
+                await page.screenshot(path="debug_final_graph.png")
+                print(f"[debug] Saved final graph screenshot", file=sys.stderr)
+            
+            dom_scraped_data = await scrape_dom_prices(page, verbose=verbose)
+            
             # Wait longer for any final network requests to complete
             if verbose:
                 print(f"[info] Waiting for final network requests to complete...", file=sys.stderr)
@@ -312,7 +447,11 @@ async def scrape_price_graph_data(
         finally:
             await browser.close()
     
-    return price_data
+    # Return both API responses and DOM-scraped data
+    return {
+        'api_responses': price_data,
+        'dom_scraped': dom_scraped_data
+    }
 
 
 def parse_price_data(responses: List[Dict[str, Any]], verbose: bool = False) -> List[Dict[str, Any]]:
@@ -414,12 +553,12 @@ async def expand_dates(
     if verbose:
         print(f"[info] Looking for prices between ${min_price} and ${max_price}", file=sys.stderr)
     
-    # Scrape price graph data
-    responses = await scrape_price_graph_data(
+    # Scrape price graph data (API + DOM)
+    result_data = await scrape_price_graph_data(
         origin, destination, reference_start, reference_end, verbose=verbose
     )
     
-    if not responses:
+    if not result_data or not result_data.get('api_responses'):
         if verbose:
             print(f"[warn] No network data captured", file=sys.stderr)
         return {
@@ -433,8 +572,13 @@ async def expand_dates(
             'raw_responses': []
         }
     
-    # Parse the responses
-    all_dates = parse_price_data(responses, verbose=verbose)
+    # Parse the API responses
+    all_dates = parse_price_data(result_data['api_responses'], verbose=verbose)
+    
+    # TODO: Parse and merge DOM-scraped data
+    # For now, just log what we got
+    if verbose and result_data.get('dom_scraped'):
+        print(f"[info] DOM scraped {len(result_data['dom_scraped'])} additional data points", file=sys.stderr)
     
     # Filter by price threshold
     similar_deals = [
@@ -453,7 +597,7 @@ async def expand_dates(
         'reference_end': reference_end,
         'price_range': {'min': min_price, 'max': max_price},
         'similar_deals': similar_deals,
-        'raw_responses': [{'url': r['url'], 'size': len(r['body'])} for r in responses]
+        'raw_responses': [{'url': r['url'], 'size': len(r['body'])} for r in result_data['api_responses']]
     }
 
 
