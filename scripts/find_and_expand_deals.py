@@ -64,34 +64,74 @@ async def find_and_expand_deals(
     Returns:
         Dict with explore_deals and expanded_deals
     """
+    # Default regions if none specified
+    if regions is None:
+        regions = ["anywhere", "Europe", "Asia", "Africa", "South America", "Oceania", "Caribbean", "Middle East"]
+    
     if verbose:
         print(f"\n{'='*60}", file=sys.stderr)
         print(f"Finding and expanding deals from {origin}", file=sys.stderr)
+        print(f"Regions: {', '.join(regions)}", file=sys.stderr)
         print(f"Threshold: ±{threshold*100:.0f}%", file=sys.stderr)
         print(f"Min similar deals required: {min_similar_deals}", file=sys.stderr)
         print(f"{'='*60}\n", file=sys.stderr)
     
-    # Step 1: Find cheap deals using Explore scraper
-    if verbose:
-        print(f"[1/2] Running Explore scraper for {origin}...", file=sys.stderr)
+    # Step 1: Find cheap deals using Explore scraper across all regions
+    all_explore_deals = []
     
-    explore_deals = await explore_run(
-        tfs_url=None,
-        tfs_blob=None,
-        origin_airport=origin,
-        region=None,
-        html_file=None,
-        use_browser=True,
-        hl="en",
-        gl="us",
-        proxy=proxy,
-        max_bytes=16000,
-        timeout=30.0,
-        verbose=verbose,
-    )
+    for i, region in enumerate(regions, 1):
+        if verbose:
+            print(f"[1/{len(regions)+1}] Running Explore scraper for {origin} → {region}...", file=sys.stderr)
+        
+        try:
+            region_deals = await explore_run(
+                tfs_url=None,
+                tfs_blob=None,
+                origin_airport=origin,
+                region=None if region == "anywhere" else region,
+                html_file=None,
+                use_browser=True,
+                hl="en",
+                gl="us",
+                proxy=proxy,
+                max_bytes=16000,
+                timeout=30.0,
+                verbose=False,  # Don't spam logs for each region
+            )
+            
+            # Tag each deal with its region
+            for deal in region_deals:
+                deal['search_region'] = region
+            
+            all_explore_deals.extend(region_deals)
+            
+            if verbose:
+                print(f"[✓] Found {len(region_deals)} destinations in {region}", file=sys.stderr)
+        
+        except Exception as e:
+            if verbose:
+                print(f"[✗] Error searching {region}: {e}", file=sys.stderr)
+            continue
+    
+    # Deduplicate destinations (same destination may appear in multiple regions)
+    seen_destinations = {}
+    explore_deals = []
+    
+    for deal in all_explore_deals:
+        dest = deal['destination']
+        if dest not in seen_destinations:
+            seen_destinations[dest] = deal
+            explore_deals.append(deal)
+        else:
+            # Keep the cheaper price if duplicate
+            if deal.get('min_price', float('inf')) < seen_destinations[dest].get('min_price', float('inf')):
+                seen_destinations[dest] = deal
+                # Replace in list
+                explore_deals = [d for d in explore_deals if d['destination'] != dest]
+                explore_deals.append(deal)
     
     if verbose:
-        print(f"\n[✓] Found {len(explore_deals)} destinations", file=sys.stderr)
+        print(f"\n[✓] Total: {len(explore_deals)} unique destinations (deduplicated from {len(all_explore_deals)})", file=sys.stderr)
     
     # Filter out deals without dates (can't expand them)
     valid_deals = [
@@ -215,24 +255,33 @@ Examples:
     )
     
     parser.add_argument("--origin", required=True, help="Origin airport IATA code")
+    parser.add_argument("--regions", type=str, help="Comma-separated regions to search (default: all regions)")
     parser.add_argument("--threshold", type=float, default=0.10, help="Price threshold for similar deals (default: 0.10 = ±10%%)")
-    parser.add_argument("--min-similar-deals", type=int, default=1, help="Minimum similar dates required to keep a deal (default: 1)")
+    parser.add_argument("--min-similar-deals", type=int, default=5, help="Minimum similar dates required to keep a deal (default: 5)")
     parser.add_argument("--limit", type=int, help="Max number of deals to expand (default: all)")
     parser.add_argument("--out", help="Output JSON file (default: stdout)")
     parser.add_argument("--proxy", help="HTTP/SOCKS proxy")
+    parser.add_argument("--used-deals-file", help="JSON file tracking previously used deals")
     parser.add_argument("--verbose", action="store_true", help="Verbose output")
     
     args = parser.parse_args()
+    
+    # Parse regions if provided
+    regions_list = None
+    if args.regions:
+        regions_list = [r.strip() for r in args.regions.split(',')]
     
     # Run the combined workflow
     result = asyncio.run(
         find_and_expand_deals(
             origin=args.origin,
+            regions=regions_list,
             threshold=args.threshold,
             min_similar_deals=args.min_similar_deals,
             limit=args.limit,
             verbose=args.verbose,
-            proxy=args.proxy
+            proxy=args.proxy,
+            used_deals_file=args.used_deals_file
         )
     )
     
