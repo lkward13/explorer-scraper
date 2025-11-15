@@ -40,22 +40,26 @@ except FileNotFoundError:
 
 async def find_and_expand_deals(
     origin: str,
+    regions: Optional[List[str]] = None,
     threshold: float = 0.10,
-    min_similar_deals: int = 1,
+    min_similar_deals: int = 5,
     limit: Optional[int] = None,
     verbose: bool = False,
     proxy: Optional[str] = None,
+    used_deals_file: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Find cheap deals and expand each to find flexible dates.
     
     Args:
         origin: Origin airport IATA code
+        regions: List of regions to search (e.g., ["Europe", "Asia"]) - None = anywhere
         threshold: Price threshold for similar deals (0.10 = ±10%)
         min_similar_deals: Minimum number of similar dates required to keep a deal
         limit: Maximum number of deals to expand (None = all)
         verbose: Print detailed progress
         proxy: Optional proxy string
+        used_deals_file: JSON file tracking previously used deals
         
     Returns:
         Dict with explore_deals and expanded_deals
