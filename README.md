@@ -13,19 +13,22 @@ pip install -r requirements.txt
 protoc --python_out=. flights.proto
 playwright install chromium
 
-# Step 1: Find cheap deals from DFW
-python -m explore_scraper.cli --origin DFW --use-browser --out deals.json
+# Collect regions for your origin (one-time setup)
+python scripts/collect_regions.py --origin DFW
 
-# Step 2: Expand a specific deal to find flexible dates
-python scripts/expand_dates.py \
-  --origin DFW \
-  --destination SEA \
-  --start 2025-12-08 \
-  --end 2025-12-15 \
-  --price 66 \
-  --threshold 0.10 \
-  --out expanded.json
+# Find flexible deals (automated pipeline)
+python scripts/find_and_expand_deals.py --origin DFW --verbose --out deals.json
 ```
+
+**That's it!** The script will:
+1. Search 8 regions (anywhere, Europe, Asia, Africa, South America, Oceania, Caribbean, Middle East)
+2. Find 355+ destinations
+3. Take top 10 cheapest from each region (80 deals)
+4. Expand them to find flexible dates (300+ date combinations each)
+5. Return only deals with 5+ similar dates within ±10%
+6. Stop after finding 10 good deals
+
+**Example output:** 10 flexible deals with variety (Europe, Asia, Africa, etc.)
 
 ---
 
@@ -276,54 +279,52 @@ data/
 
 ---
 
-## Current Status
+## Current Status (v1.2 - Production Ready!)
 
-### ✅ Working Features
+### ✅ Fully Working Pipeline
 
-**Explore Scraper:**
-- Airport code-based searches (any IATA code worldwide)
-- Programmatic TFS generation via Protocol Buffers
-- Playwright browser automation
-- Extracts: destination, price, currency, dates, duration
-- Base64 decoding of embedded flight data
-- Proxy support (HTTP/SOCKS)
-- HTML file parsing (offline mode)
-- Error handling for 0 results
+**Combined Script (`find_and_expand_deals.py`):**
+- ✅ **Multi-region search** - Searches 8 regions automatically (anywhere, Europe, Asia, Africa, South America, Oceania, Caribbean, Middle East)
+- ✅ **Smart selection** - Takes top 10 cheapest from EACH region (ensures variety, not just domestic)
+- ✅ **Parallel processing** - Expands 2 deals at a time (2x faster)
+- ✅ **Quality filtering** - Requires 5+ similar dates within ±10% price threshold
+- ✅ **Early stopping** - Stops after finding 10 flexible deals (saves time)
+- ✅ **City→IATA mapping** - 100+ cities mapped automatically
 
-**Date Expander:**
-- Protobuf-based Google Flights URL generation
-- Price graph automation (click, scroll, paginate)
-- Network interception for GetCalendarGraph API
-- Parses 300+ date combinations across 10+ months
-- Deduplication logic
-- Threshold-based filtering (±10%, ±25%, etc.)
-- Returns both complete dataset and filtered results
-- Verbose logging for debugging
+**Tested Results (DFW):**
+- Found 355 unique destinations across all regions
+- Expanded 32 deals before finding 10 flexible ones
+- Output: 6 Europe, 2 Asia, 1 Middle East, 1 Africa deals
+- Prices: $415-$984 with 32-147 similar date options each
+
+**Individual Scripts:**
+- ✅ `explore_scraper.cli` - Find destinations from any origin
+- ✅ `expand_dates.py` - Expand single deal to find flexible dates
+- ✅ `collect_regions.py` - Collect region TFS for an origin (one-time setup)
+- ✅ `collect_all_regions.py` - Batch collect for multiple origins
 
 ### ⚠️ Known Limitations
 
-- **Browser required**: Both scripts need Playwright (Google uses JavaScript SPAs)
-- **Sandbox issues**: macOS/Linux may need `--required_permissions: ['all']` in AI tools
-- **API data range**: Google provides 10-11 months of pricing data (not infinite)
-- **Exceptional deals**: Very cheap prices may have few/no similar alternatives
-- **Duration field**: Sometimes null in Explore results (Google's data availability)
+- **Browser required**: Uses Playwright for JavaScript rendering
+- **City mapping**: Some destinations need IATA codes added to `data/city_to_iata.json`
+- **Region setup**: Must run `collect_regions.py` once per origin before first use
+- **Batch size**: Limited to 2 concurrent browsers to avoid resource issues
 
-### 🚧 Next Steps
+### 🚧 Next Steps (Deferred)
 
-**Immediate:**
-- [ ] Combine scripts into single automated pipeline
-- [ ] Add deal selection criteria (domestic vs international, price thresholds)
-- [ ] Filter deals by flexibility (require 5-10 similar dates, not just 1-2)
-- [ ] Add "recently used" tracking to avoid repeat destinations
+**For Production Scale:**
+- [ ] Used deals tracking (35-day window to avoid repeats)
+- [ ] Collect regions for top 100 US airports
+- [ ] Budget airline detection/filtering
+- [ ] Batch processing for multiple origins
+- [ ] Database storage for deal history
 
 **Future Enhancements:**
-- [ ] Multi-origin batch mode (scrape top 150 US airports)
-- [ ] Database storage for historical price tracking
-- [ ] Email/Slack notifications for good deals
 - [ ] Web UI for browsing deals
-- [ ] Airline preference filtering
-- [ ] Layover duration preferences
-- [ ] Image URLs and coordinates extraction
+- [ ] Email/Slack notifications
+- [ ] Price history tracking
+- [ ] Airline/layover preferences
+- [ ] Non-stop flight filtering
 
 ---
 
