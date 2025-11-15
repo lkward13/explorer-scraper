@@ -155,21 +155,34 @@ async def find_and_expand_deals(
             }
         }
     
-    # Sort all deals by price (cheapest first) - people care about price most
-    valid_deals_sorted = sorted(valid_deals, key=lambda x: x.get('min_price', 999999))
+    # Group deals by region and take cheapest from each for variety
+    deals_by_region = {}
+    for deal in valid_deals:
+        region = deal.get('search_region', 'unknown')
+        if region not in deals_by_region:
+            deals_by_region[region] = []
+        deals_by_region[region].append(deal)
     
-    # Determine how many to expand
+    # Sort each region by price
+    for region in deals_by_region:
+        deals_by_region[region].sort(key=lambda x: x.get('min_price', 999999))
+    
+    # Determine how many to take from each region
     if limit:
-        expand_count = min(limit, len(valid_deals_sorted))
+        per_region = max(1, limit // len(deals_by_region))
     else:
-        expand_count = min(80, len(valid_deals_sorted))  # Default: expand top 80 cheapest
+        per_region = 10  # Default: top 10 cheapest from each region
     
-    deals_to_expand = valid_deals_sorted[:expand_count]
+    # Take top N cheapest from each region
+    deals_to_expand = []
+    for region, region_deals in deals_by_region.items():
+        deals_to_expand.extend(region_deals[:per_region])
     
     if verbose:
-        print(f"\n[info] Sorted {len(valid_deals)} deals by price", file=sys.stderr)
-        print(f"[info] Price range: ${valid_deals_sorted[0].get('min_price')} - ${valid_deals_sorted[-1].get('min_price')}", file=sys.stderr)
-        print(f"[info] Will expand top {expand_count} cheapest deals", file=sys.stderr)
+        print(f"\n[info] Taking top {per_region} cheapest deals from each of {len(deals_by_region)} regions", file=sys.stderr)
+        for region, region_deals in sorted(deals_by_region.items(), key=lambda x: x[0]):
+            cheapest = region_deals[0].get('min_price') if region_deals else 0
+            print(f"  {region}: {len(region_deals)} deals (cheapest: ${cheapest})", file=sys.stderr)
         print(f"\n[2/2] Expanding {len(deals_to_expand)} deals...", file=sys.stderr)
     
     # Step 2: Expand deals in batches (parallel processing)
