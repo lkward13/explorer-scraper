@@ -1,0 +1,140 @@
+
+============================================================
+Finding and expanding deals from DFW
+Regions: anywhere, Europe, Asia, Africa, South America, Oceania, Caribbean, Middle East
+Threshold: ±10%
+Min similar deals required: 5
+============================================================
+
+[1/9] Running Explore scraper for DFW → anywhere...
+[✓] Found 64 destinations in anywhere
+[1/9] Running Explore scraper for DFW → Europe...
+[✓] Found 54 destinations in Europe
+[1/9] Running Explore scraper for DFW → Asia...
+[✓] Found 49 destinations in Asia
+[1/9] Running Explore scraper for DFW → Africa...
+[✓] Found 37 destinations in Africa
+[1/9] Running Explore scraper for DFW → South America...
+[✓] Found 56 destinations in South America
+[1/9] Running Explore scraper for DFW → Oceania...
+[✓] Found 7 destinations in Oceania
+[1/9] Running Explore scraper for DFW → Caribbean...
+[✓] Found 45 destinations in Caribbean
+[1/9] Running Explore scraper for DFW → Middle East...
+[✓] Found 60 destinations in Middle East
+
+[✓] Total: 359 unique destinations (deduplicated from 372)
+[✓] 359 deals have valid dates for expansion
+
+[info] Sorted 359 deals by price
+[info] Price range: $45 - $9025
+[info] Will expand top 80 cheapest deals
+
+[2/2] Expanding 80 deals...
+
+[1/80] Expanding: DFW → Miami ($45)
+[✗] Only 1 similar dates - SKIPPING (need 5+)
+
+[2/80] Expanding: DFW → Fort Lauderdale ($45)
+[!] Skipping Fort Lauderdale - no IATA mapping
+
+[3/80] Expanding: DFW → Miami Beach ($45)
+[!] Skipping Miami Beach - no IATA mapping
+
+[4/80] Expanding: DFW → Orlando ($48)
+[✗] Only 1 similar dates - SKIPPING (need 5+)
+
+[5/80] Expanding: DFW → Chicago ($48)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[6/80] Expanding: DFW → Las Vegas ($48)
+[✗] Only 4 similar dates - SKIPPING (need 5+)
+
+[7/80] Expanding: DFW → Zion National Park ($48)
+[!] Skipping Zion National Park - no IATA mapping
+
+[8/80] Expanding: DFW → Walt Disney World® Resort ($48)
+[!] Skipping Walt Disney World® Resort - no IATA mapping
+
+[9/80] Expanding: DFW → Bryce Canyon National Park ($48)
+[!] Skipping Bryce Canyon National Park - no IATA mapping
+
+[10/80] Expanding: DFW → Grand Canyon National Park ($48)
+[!] Skipping Grand Canyon National Park - no IATA mapping
+
+[11/80] Expanding: DFW → Denver ($48)
+[✗] Only 4 similar dates - SKIPPING (need 5+)
+
+[12/80] Expanding: DFW → Atlanta ($48)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[13/80] Expanding: DFW → Rocky Mountain National Park ($48)
+[!] Skipping Rocky Mountain National Park - no IATA mapping
+
+[14/80] Expanding: DFW → Tampa ($48)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[15/80] Expanding: DFW → Death Valley National Park ($48)
+[!] Skipping Death Valley National Park - no IATA mapping
+
+[16/80] Expanding: DFW → Indiana Dunes National Park ($48)
+[!] Skipping Indiana Dunes National Park - no IATA mapping
+
+[17/80] Expanding: DFW → Wind Cave National Park ($48)
+[!] Skipping Wind Cave National Park - no IATA mapping
+
+[18/80] Expanding: DFW → Los Angeles ($58)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[19/80] Expanding: DFW → Washington, D.C. ($58)
+[!] Skipping Washington, D.C. - no IATA mapping
+
+[20/80] Expanding: DFW → Baltimore ($58)
+[✗] Only 4 similar dates - SKIPPING (need 5+)
+
+[21/80] Expanding: DFW → New Orleans ($58)
+[✗] Only 1 similar dates - SKIPPING (need 5+)
+
+[22/80] Expanding: DFW → Salt Lake City ($58)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[23/80] Expanding: DFW → Canyonlands National Park ($58)
+[!] Skipping Canyonlands National Park - no IATA mapping
+
+[24/80] Expanding: DFW → Santa Monica ($58)
+[!] Skipping Santa Monica - no IATA mapping
+
+[25/80] Expanding: DFW → Seattle ($66)
+[✗] Only 1 similar dates - SKIPPING (need 5+)
+
+[26/80] Expanding: DFW → Olympic National Park ($66)
+[!] Skipping Olympic National Park - no IATA mapping
+
+[27/80] Expanding: DFW → Phoenix ($66)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[28/80] Expanding: DFW → Sedona ($66)
+[!] Skipping Sedona - no IATA mapping
+
+[29/80] Expanding: DFW → San Diego ($70)
+[✗] Only 1 similar dates - SKIPPING (need 5+)
+
+[30/80] Expanding: DFW → Minneapolis ($77)
+[✗] Only 4 similar dates - SKIPPING (need 5+)
+
+[31/80] Expanding: DFW → Saint Paul ($77)
+[!] Skipping Saint Paul - no IATA mapping
+
+[32/80] Expanding: DFW → New York ($79)
+[✗] Only 0 similar dates - SKIPPING (need 5+)
+
+[33/80] Expanding: DFW → Newark ($79)
+[!] Skipping Newark - no IATA mapping
+
+[34/80] Expanding: DFW → Saguaro National Park ($79)
+[!] Skipping Saguaro National Park - no IATA mapping
+
+[35/80] Expanding: DFW → St. Louis ($95)
+[✗] Error expanding St. Louis: Browser.close: Connection closed while reading from the driver
+
+[36/80] Expanding: DFW → Austin ($97)

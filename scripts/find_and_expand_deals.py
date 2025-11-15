@@ -155,23 +155,34 @@ async def find_and_expand_deals(
             }
         }
     
-    # Limit number of deals to expand if specified
-    deals_to_expand = valid_deals[:limit] if limit else valid_deals
+    # Sort all deals by price (cheapest first) - people care about price most
+    valid_deals_sorted = sorted(valid_deals, key=lambda x: x.get('min_price', 999999))
+    
+    # Determine how many to expand
+    if limit:
+        expand_count = min(limit, len(valid_deals_sorted))
+    else:
+        expand_count = min(80, len(valid_deals_sorted))  # Default: expand top 80 cheapest
+    
+    deals_to_expand = valid_deals_sorted[:expand_count]
     
     if verbose:
+        print(f"\n[info] Sorted {len(valid_deals)} deals by price", file=sys.stderr)
+        print(f"[info] Price range: ${valid_deals_sorted[0].get('min_price')} - ${valid_deals_sorted[-1].get('min_price')}", file=sys.stderr)
+        print(f"[info] Will expand top {expand_count} cheapest deals", file=sys.stderr)
         print(f"\n[2/2] Expanding {len(deals_to_expand)} deals...", file=sys.stderr)
     
-    # Step 2: Expand each deal to find flexible dates
+    # Step 2: Expand deals in batches (parallel processing)
     expanded_deals = []
+    max_good_deals = 10  # Stop after finding this many good deals
+    batch_size = 2  # Process 2 deals at a time (each opens a browser)
     
-    for i, deal in enumerate(deals_to_expand, 1):
+    async def expand_single_deal(deal, deal_num, total_deals):
+        """Expand a single deal and return result if it passes threshold."""
         destination = deal['destination']
         price = deal['min_price']
         start_date = deal['start_date']
         end_date = deal['end_date']
-        
-        if verbose:
-            print(f"\n[{i}/{len(deals_to_expand)}] Expanding: {origin} → {destination} (${price})", file=sys.stderr)
         
         try:
             # Map city name to IATA code
@@ -179,8 +190,11 @@ async def find_and_expand_deals(
             
             if not dest_code:
                 if verbose:
-                    print(f"[!] Skipping {destination} - no IATA mapping", file=sys.stderr)
-                continue
+                    print(f"[{deal_num}/{total_deals}] {destination} - no IATA mapping", file=sys.stderr)
+                return None
+            
+            if verbose:
+                print(f"[{deal_num}/{total_deals}] Expanding: {origin} → {destination} (${price})", file=sys.stderr)
             
             # Expand the deal to find flexible dates
             expansion = await expand_dates(
@@ -190,28 +204,56 @@ async def find_and_expand_deals(
                 reference_end=end_date,
                 reference_price=price,
                 threshold=threshold,
-                verbose=False  # Don't spam logs for each expansion
+                verbose=False  # Don't spam logs
             )
             
             # Check if deal has enough flexibility
             similar_count = len(expansion['similar_deals'])
             
             if similar_count >= min_similar_deals:
-                expanded_deals.append({
+                if verbose:
+                    print(f"[✓] {destination}: {similar_count} similar dates - KEEPING", file=sys.stderr)
+                return {
                     'explore_deal': deal,
                     'expansion': expansion,
                     'similar_deals_count': similar_count
-                })
-                if verbose:
-                    print(f"[✓] Found {similar_count} similar dates - KEEPING", file=sys.stderr)
+                }
             else:
                 if verbose:
-                    print(f"[✗] Only {similar_count} similar dates - SKIPPING (need {min_similar_deals}+)", file=sys.stderr)
+                    print(f"[✗] {destination}: {similar_count} similar dates - SKIPPING", file=sys.stderr)
+                return None
                 
         except Exception as e:
             if verbose:
-                print(f"[✗] Error expanding {destination}: {e}", file=sys.stderr)
-            continue
+                print(f"[✗] {destination}: Error - {str(e)[:50]}", file=sys.stderr)
+            return None
+    
+    # Process deals in batches
+    for batch_start in range(0, len(deals_to_expand), batch_size):
+        # Early stopping if we found enough
+        if len(expanded_deals) >= max_good_deals:
+            if verbose:
+                print(f"\n[✓] Found {len(expanded_deals)} flexible deals - stopping early", file=sys.stderr)
+            break
+        
+        batch_end = min(batch_start + batch_size, len(deals_to_expand))
+        batch = deals_to_expand[batch_start:batch_end]
+        
+        if verbose:
+            print(f"\n--- Batch {batch_start//batch_size + 1} ({batch_start+1}-{batch_end} of {len(deals_to_expand)}) ---", file=sys.stderr)
+        
+        # Expand all deals in batch concurrently
+        tasks = [
+            expand_single_deal(deal, batch_start + i + 1, len(deals_to_expand))
+            for i, deal in enumerate(batch)
+        ]
+        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Collect successful expansions
+        for result in results:
+            if result and not isinstance(result, Exception):
+                expanded_deals.append(result)
     
     if verbose:
         print(f"\n{'='*60}", file=sys.stderr)
