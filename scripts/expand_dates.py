@@ -575,19 +575,35 @@ async def expand_dates(
     # Parse the API responses
     all_dates = parse_price_data(result_data['api_responses'], verbose=verbose)
     
+    if verbose:
+        print(f"[info] Total parsed: {len(all_dates)} date combinations", file=sys.stderr)
+    
+    # Remove duplicates (same start_date, end_date, price)
+    seen = set()
+    unique_dates = []
+    for d in all_dates:
+        key = (d['start_date'], d['end_date'], d['price'])
+        if key not in seen:
+            seen.add(key)
+            unique_dates.append(d)
+    
+    if verbose:
+        print(f"[info] After deduplication: {len(unique_dates)} unique combinations", file=sys.stderr)
+    
     # TODO: Parse and merge DOM-scraped data
     # For now, just log what we got
     if verbose and result_data.get('dom_scraped'):
         print(f"[info] DOM scraped {len(result_data['dom_scraped'])} additional data points", file=sys.stderr)
     
-    # Filter by price threshold
+    # Filter by price threshold to find similar deals
     similar_deals = [
-        d for d in all_dates 
+        d for d in unique_dates 
         if min_price <= d.get('price', 0) <= max_price
     ]
     
     if verbose:
-        print(f"\n[info] Found {len(similar_deals)} deals within price range", file=sys.stderr)
+        print(f"\n[info] Found {len(similar_deals)} deals within ±{threshold*100:.0f}% of ${reference_price} (${min_price}-${max_price})", file=sys.stderr)
+        print(f"[info] Total data available: {len(unique_dates)} date combinations", file=sys.stderr)
     
     return {
         'origin': origin,
@@ -595,8 +611,10 @@ async def expand_dates(
         'reference_price': reference_price,
         'reference_start': reference_start,
         'reference_end': reference_end,
+        'threshold': threshold,
         'price_range': {'min': min_price, 'max': max_price},
         'similar_deals': similar_deals,
+        'all_dates': unique_dates,  # Include ALL parsed data
         'raw_responses': [{'url': r['url'], 'size': len(r['body'])} for r in result_data['api_responses']]
     }
 
