@@ -1,0 +1,57 @@
+
+============================================================
+Finding and expanding deals from IAH
+Regions: anywhere
+Threshold: ±10%
+Min similar deals required: 5
+============================================================
+
+[1/2] Running Explore scraper for IAH → anywhere...
+[✓] Found 62 destinations in anywhere
+
+[✓] Total: 62 unique destinations (deduplicated from 62)
+[✓] 62 deals have valid dates for expansion
+
+[info] Taking top 10 cheapest deals from each of 1 regions
+  anywhere: 62 deals (cheapest: $48)
+
+[2/2] Expanding 10 deals...
+
+--- Batch 1 (1-2 of 10) ---
+[1/10] Expanding: IAH → Atlanta ($48)
+[2/10] Expanding: IAH → Philadelphia ($50)
+[✗] Philadelphia: 1 similar dates - SKIPPING
+[✗] Atlanta: 2 similar dates - SKIPPING
+
+--- Batch 2 (3-4 of 10) ---
+[3/10] Expanding: IAH → Denver ($58)
+[4/10] Expanding: IAH → Washington, D.C. ($58)
+[✗] Denver: Error - local variable 'actual_destination' referenced bef
+[✓] Washington, D.C.: 8 similar dates - KEEPING
+
+--- Batch 3 (5-6 of 10) ---
+[5/10] Expanding: IAH → Rocky Mountain National Park ($58)
+[6/10] Expanding: IAH → Baltimore ($58)
+[✗] Baltimore: Error - local variable 'actual_destination' referenced bef
+[✓] Rocky Mountain National Park: 17 similar dates - KEEPING
+
+--- Batch 4 (7-8 of 10) ---
+[7/10] Expanding: IAH → Tampa ($58)
+[8/10] Expanding: IAH → Grand Canyon National Park ($59)
+[✗] Tampa: 2 similar dates - SKIPPING
+[✗] Grand Canyon National Park: 0 similar dates - SKIPPING
+
+--- Batch 5 (9-10 of 10) ---
+[9/10] Expanding: IAH → Phoenix ($59)
+[10/10] Sedona - no IATA mapping
+[✗] Phoenix: 2 similar dates - SKIPPING
+
+============================================================
+Summary:
+  Total destinations found: 62
+  Deals with valid dates: 62
+  Deals expanded: 10
+  Deals with sufficient flexibility: 2
+============================================================
+
+✅ Saved to iah_deals.json

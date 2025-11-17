@@ -298,6 +298,56 @@ async def scrape_price_graph_data(
                 if verbose:
                     print(f"[warn] Could not extract deal quality: {e}", file=sys.stderr)
             
+            # Extract flight details from the page (best flight option)
+            flight_details = None
+            try:
+                # Wait for flight results to load - look for the "Best" tab content
+                await page.wait_for_selector('text="Top departing flights"', timeout=5000)
+                await page.wait_for_timeout(2000)  # Let flights fully render
+                
+                # Get all text from the page to parse
+                flight_text = await page.text_content("body")
+                
+                # Extract airline (first major airline mentioned after "Top departing flights")
+                airline_match = re.search(r'Top departing flights.*?(United|Delta|American|Southwest|JetBlue|Alaska|Spirit|Frontier|Lufthansa|British Airways|Air France|KLM|Iberia|Turkish|Emirates|Qatar|Aer Lingus|Ryanair|EasyJet|Norwegian|Icelandair|TAP|Alitalia|Swiss|Austrian|SAS|Finnair|LOT|Air Canada|WestJet|Volaris|Aeromexico|Copa|Avianca|LATAM|Gol|Azul)', flight_text, re.IGNORECASE | re.DOTALL)
+                airline = airline_match.group(1) if airline_match else None
+                
+                # Extract first flight duration (e.g., "18 h 30 min" or "18h 30min")
+                duration_match = re.search(r'(\d+)\s*h(?:r)?\s*(\d+)?\s*min', flight_text)
+                duration = None
+                if duration_match:
+                    hours = int(duration_match.group(1))
+                    minutes = int(duration_match.group(2)) if duration_match.group(2) else 0
+                    duration = f"{hours}h {minutes}m" if minutes else f"{hours}h"
+                
+                # Extract stops (look for first occurrence)
+                stops = None
+                if 'Nonstop' in flight_text or 'nonstop' in flight_text:
+                    stops = 0
+                else:
+                    stops_match = re.search(r'(\d+)\s*stop', flight_text, re.IGNORECASE)
+                    if stops_match:
+                        stops = int(stops_match.group(1))
+                
+                # Extract departure/arrival times (first two times found)
+                time_match = re.findall(r'(\d{1,2}:\d{2}\s*[AP]M)', flight_text)
+                departure_time = time_match[0] if len(time_match) > 0 else None
+                arrival_time = time_match[1] if len(time_match) > 1 else None
+                
+                flight_details = {
+                    'airline': airline,
+                    'duration': duration,
+                    'stops': stops,
+                    'departure_time': departure_time,
+                    'arrival_time': arrival_time
+                }
+                
+                if verbose and flight_details.get('airline'):
+                    print(f"[info] Flight: {flight_details.get('airline')} - {flight_details.get('duration')} - {stops if stops is not None else '?'} stops", file=sys.stderr)
+            except Exception as e:
+                if verbose:
+                    print(f"[warn] Could not extract flight details: {e}", file=sys.stderr)
+            
             # Save screenshot for debugging
             if verbose:
                 await page.screenshot(path="debug_flights_initial.png")
@@ -493,7 +543,8 @@ async def scrape_price_graph_data(
         'dom_scraped': dom_scraped_data,
         'actual_destination': actual_destination,
         'deal_quality': deal_quality,
-        'deal_quality_amount': deal_quality_amount
+        'deal_quality_amount': deal_quality_amount,
+        'flight_details': flight_details
     }
 
 
@@ -586,6 +637,7 @@ async def expand_dates(
     actual_destination = None
     deal_quality = None
     deal_quality_amount = None
+    flight_details = None
     
     if verbose:
         print(f"\n{'='*60}", file=sys.stderr)
@@ -611,6 +663,7 @@ async def expand_dates(
         actual_destination = result_data.get('actual_destination')
         deal_quality = result_data.get('deal_quality')
         deal_quality_amount = result_data.get('deal_quality_amount')
+        flight_details = result_data.get('flight_details')
     
     if not result_data or not result_data.get('api_responses'):
         if verbose:
@@ -618,11 +671,15 @@ async def expand_dates(
         return {
             'origin': origin,
             'destination': destination,
+            'actual_destination': actual_destination,
             'reference_price': reference_price,
             'reference_start': reference_start,
             'reference_end': reference_end,
             'price_range': {'min': min_price, 'max': max_price},
             'similar_deals': [],
+            'deal_quality': deal_quality,
+            'deal_quality_amount': deal_quality_amount,
+            'flight_details': flight_details,
             'raw_responses': []
         }
     
@@ -672,6 +729,7 @@ async def expand_dates(
         'all_dates': unique_dates,  # Include ALL parsed data
         'deal_quality': deal_quality,  # "$X cheaper than usual"
         'deal_quality_amount': deal_quality_amount,  # Dollar amount
+        'flight_details': flight_details,  # Airline, duration, stops, times
         'raw_responses': [{'url': r['url'], 'size': len(r['body'])} for r in result_data['api_responses']]
     }
 
