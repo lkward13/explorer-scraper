@@ -1,0 +1,15 @@
+URL: https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=3707573878037525333&bl=boq_travel-frontend-flights-ui_20251114.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=1349486&rt=c
+Size: 1013 bytes
+================================================================================
+)]}'
+
+362
+[["wrb.fr",null,"[[null,[[1763408711005227,133563970,3859366169],null,null,null,null,[[0]]],0,\"R3sbaesowozY7w-ZgqWwDg\",\"Hzarpj0uxDnYAARk7wBG---------oyzc11AAAAAGkbe0cARm9AA\"],[[\"2026-10-03\",\"2026-10-12\",[[null,408],\"CjRIemFycGowdXhEbllBQVJrN3dCRy0tLS0tLS0tLW95emMxMUFBQUFBR2tiZTBjQVJtOUFBEgcyODk6Mjk4GgsI/r0CEAIaA1VTRDgWcP69Ag\\u003d\\u003d\"],1]]]"]]
+362
+[["wrb.fr",null,"[[null,[[1763408711005227,133563970,3859366169],null,null,null,null,[[1]]],1,\"R3sbaesowozY7w-ZgqWwDg\",\"Hzarpj0uxDnYAARk7wBG---------oyzc11AAAAAGkbe0cARm9AA\"],[[\"2026-10-02\",\"2026-10-11\",[[null,434],\"CjRIemFycGowdXhEbllBQVJrN3dCRy0tLS0tLS0tLW95emMxMUFBQUFBR2tiZTBjQVJtOUFBEgcyODg6Mjk3GgsItNICEAIaA1VTRDgWcLTSAg\\u003d\\u003d\"],1]]]"]]
+184
+[["wrb.fr",null,"[[null,[[1763408711005227,133563970,3859366169],null,null,null,null,[[2]]],2,\"R3sbaesowozY7w-ZgqWwDg\",\"Hzarpj0uxDnYAARk7wBG---------oyzc11AAAAAGkbe0cARm9AA\"]]"]]
+60
+[["di",2288],["af.httprm",2287,"-3169939525319942248",12]]
+26
+[["e",6,null,null,1013]]

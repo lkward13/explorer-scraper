@@ -621,7 +621,8 @@ def parse_price_data(responses: List[Dict[str, Any]], verbose: bool = False) -> 
             parsed_dates.append({
                 'start_date': start_date,
                 'end_date': end_date,
-                'price': int(price)
+                'price': int(price),
+                'url': None  # Will be populated later with origin/destination context
             })
     
     if verbose:
@@ -726,6 +727,18 @@ async def expand_dates(
     # For now, just log what we got
     if verbose and result_data.get('dom_scraped'):
         print(f"[info] DOM scraped {len(result_data['dom_scraped'])} additional data points", file=sys.stderr)
+    
+    # Generate Google Flights URL for each date combination
+    if verbose:
+        print(f"[info] Generating Google Flights URLs for {len(unique_dates)} date combinations...", file=sys.stderr)
+    
+    for date_combo in unique_dates:
+        date_combo['url'] = build_flights_url(
+            origin=origin,
+            destination=actual_destination or destination,
+            start_date=date_combo['start_date'],
+            end_date=date_combo['end_date']
+        )
     
     # Filter by price threshold to find similar deals
     similar_deals = [

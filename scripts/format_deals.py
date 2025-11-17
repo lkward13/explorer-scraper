@@ -31,7 +31,8 @@ def parse_expanded_route(expansion_dict: dict) -> ExpandedRoute:
         DatePrice(
             start_date=parse_date_str(d['start_date']),
             end_date=parse_date_str(d['end_date']),
-            price=d['price']
+            price=d['price'],
+            url=d.get('url')
         )
         for d in expansion_dict.get('similar_deals', [])
     ]
@@ -40,7 +41,8 @@ def parse_expanded_route(expansion_dict: dict) -> ExpandedRoute:
         DatePrice(
             start_date=parse_date_str(d['start_date']),
             end_date=parse_date_str(d['end_date']),
-            price=d['price']
+            price=d['price'],
+            url=d.get('url')
         )
         for d in expansion_dict.get('all_dates', [])
     ]

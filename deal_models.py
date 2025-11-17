@@ -26,6 +26,7 @@ class DatePrice(BaseModel):
     start_date: date
     end_date: date
     price: int
+    url: Optional[str] = None  # Google Flights URL for this specific date combo
 
 
 # ============================================================================
