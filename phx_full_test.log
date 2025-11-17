@@ -1,0 +1,74 @@
+
+============================================================
+Finding and expanding deals from PHX
+Regions: anywhere, europe, africa, south_america, oceania, caribbean
+Threshold: ±10%
+Min similar deals required: 5
+============================================================
+
+[1/7] Running Explore scraper for PHX → anywhere...
+[✓] Found 60 destinations in anywhere
+[1/7] Running Explore scraper for PHX → europe...
+[✓] Found 54 destinations in europe
+[1/7] Running Explore scraper for PHX → africa...
+[✓] Found 36 destinations in africa
+[1/7] Running Explore scraper for PHX → south_america...
+[✓] Found 51 destinations in south_america
+[1/7] Running Explore scraper for PHX → oceania...
+[✓] Found 7 destinations in oceania
+[1/7] Running Explore scraper for PHX → caribbean...
+[✓] Found 45 destinations in caribbean
+
+[✓] Total: 250 unique destinations (deduplicated from 253)
+[✓] 250 deals have valid dates for expansion
+
+[info] Taking top 2 cheapest deals from each of 6 regions
+  africa: 36 deals (cheapest: $1132)
+  anywhere: 60 deals (cheapest: $48)
+  caribbean: 42 deals (cheapest: $283)
+  europe: 54 deals (cheapest: $433)
+  oceania: 7 deals (cheapest: $952)
+  south_america: 51 deals (cheapest: $403)
+
+[2/2] Expanding 12 deals...
+
+--- Batch 1 (1-2 of 12) ---
+[1/12] Expanding: PHX → Seattle ($48)
+[2/12] Expanding: PHX → San Francisco ($48)
+[✗] Seattle: 1 similar dates - SKIPPING
+[✗] San Francisco: 1 similar dates - SKIPPING
+
+--- Batch 2 (3-4 of 12) ---
+[3/12] Expanding: PHX → Dublin ($433)
+[4/12] Expanding: PHX → Barcelona ($434)
+[✗] Dublin: Error - local variable 'actual_destination' referenced bef
+[✗] Barcelona: Error - local variable 'actual_destination' referenced bef
+
+--- Batch 3 (5-6 of 12) ---
+[5/12] Expanding: PHX → Johannesburg ($1132)
+[6/12] Pretoria - no IATA mapping
+[✓] Johannesburg: 169 similar dates - KEEPING
+
+--- Batch 4 (7-8 of 12) ---
+[7/12] Aruba - no IATA mapping
+[8/12] Cuenca - no IATA mapping
+
+--- Batch 5 (9-10 of 12) ---
+[9/12] Expanding: PHX → Tahiti ($952)
+[10/12] Raiatea - no IATA mapping
+[✓] Tahiti: 20 similar dates - KEEPING
+
+--- Batch 6 (11-12 of 12) ---
+[11/12] Expanding: PHX → San Juan ($283)
+[12/12] El Yunque National Forest - no IATA mapping
+[✓] San Juan: 17 similar dates - KEEPING
+
+============================================================
+Summary:
+  Total destinations found: 250
+  Deals with valid dates: 250
+  Deals expanded: 12
+  Deals with sufficient flexibility: 3
+============================================================
+
+✅ Saved to phx_full_test.json
