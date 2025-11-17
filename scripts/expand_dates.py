@@ -305,34 +305,53 @@ async def scrape_price_graph_data(
                 await page.wait_for_selector('text="Top departing flights"', timeout=5000)
                 await page.wait_for_timeout(2000)  # Let flights fully render
                 
-                # Get all text from the page to parse
-                flight_text = await page.text_content("body")
+                # Get text from just the main content area (skip all the JavaScript)
+                main_content = await page.query_selector('main, [role="main"], .gws-flights-results__main')
+                if main_content:
+                    full_page_text = await main_content.text_content()
+                else:
+                    # Fallback to body if we can't find main
+                    full_page_text = await page.text_content("body")
                 
-                # Extract airline (first major airline mentioned after "Top departing flights")
-                airline_match = re.search(r'Top departing flights.*?(United|Delta|American|Southwest|JetBlue|Alaska|Spirit|Frontier|Lufthansa|British Airways|Air France|KLM|Iberia|Turkish|Emirates|Qatar|Aer Lingus|Ryanair|EasyJet|Norwegian|Icelandair|TAP|Alitalia|Swiss|Austrian|SAS|Finnair|LOT|Air Canada|WestJet|Volaris|Aeromexico|Copa|Avianca|LATAM|Gol|Azul)', flight_text, re.IGNORECASE | re.DOTALL)
-                airline = airline_match.group(1) if airline_match else None
+                # Debug: save page text to see structure
+                if verbose:
+                    with open("debug_page_text.txt", "w") as f:
+                        f.write(full_page_text[:5000])  # Save sample
+                    print(f"[debug] Saved page text sample to debug_page_text.txt", file=sys.stderr)
                 
-                # Extract first flight duration (e.g., "18 h 30 min" or "18h 30min")
-                duration_match = re.search(r'(\d+)\s*h(?:r)?\s*(\d+)?\s*min', flight_text)
+                # Simpler approach: extract each piece separately
+                # Times: find all times, take first two unique ones
+                all_times = re.findall(r'\d{1,2}:\d{2}\s*[AP]M', full_page_text)
+                unique_times = []
+                for time in all_times:
+                    if time not in unique_times:
+                        unique_times.append(time)
+                    if len(unique_times) >= 2:
+                        break
+                
+                departure_time = unique_times[0] if len(unique_times) > 0 else None
+                arrival_time = unique_times[1] if len(unique_times) > 1 else None
+                
+                # Duration: look for "X h Y min" or "Xh Ymin" pattern (flexible spacing)
+                duration_match = re.search(r'(\d+)\s*h(?:r)?\s*(\d+)?\s*min', full_page_text, re.IGNORECASE)
                 duration = None
                 if duration_match:
                     hours = int(duration_match.group(1))
                     minutes = int(duration_match.group(2)) if duration_match.group(2) else 0
                     duration = f"{hours}h {minutes}m" if minutes else f"{hours}h"
                 
-                # Extract stops (look for first occurrence)
+                # Stops: look for "Nonstop" or "X stop"
                 stops = None
-                if 'Nonstop' in flight_text or 'nonstop' in flight_text:
+                if re.search(r'Nonstop', full_page_text, re.IGNORECASE):
                     stops = 0
                 else:
-                    stops_match = re.search(r'(\d+)\s*stop', flight_text, re.IGNORECASE)
+                    stops_match = re.search(r'(\d+)\s*stop', full_page_text, re.IGNORECASE)
                     if stops_match:
                         stops = int(stops_match.group(1))
                 
-                # Extract departure/arrival times (first two times found)
-                time_match = re.findall(r'(\d{1,2}:\d{2}\s*[AP]M)', flight_text)
-                departure_time = time_match[0] if len(time_match) > 0 else None
-                arrival_time = time_match[1] if len(time_match) > 1 else None
+                # Extract airline (first major airline mentioned after "Top departing flights")
+                airline_match = re.search(r'Top departing flights.*?(United|Delta|American|Southwest|JetBlue|Alaska|Spirit|Frontier|Lufthansa|British Airways|Air France|KLM|Iberia|Turkish|Emirates|Qatar|Aer Lingus|Ryanair|EasyJet|Norwegian|Icelandair|TAP|Alitalia|Swiss|Austrian|SAS|Finnair|LOT|Air Canada|WestJet|Volaris|Aeromexico|Copa|Avianca|LATAM|Gol|Azul)', full_page_text, re.IGNORECASE | re.DOTALL)
+                airline = airline_match.group(1) if airline_match else None
                 
                 flight_details = {
                     'airline': airline,
