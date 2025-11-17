@@ -61,7 +61,7 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
         List of deal cards
     """
     if regions is None:
-        regions = ['europe', 'caribbean', 'central-america', 'south_america', 'oceania']
+        regions = ['europe', 'caribbean', 'south_america', 'oceania', 'africa']
     
     all_cards = []
     
@@ -70,23 +70,30 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
             print(f"  Exploring {origin} → {region}...")
         
         try:
-            result = explore_run(
-                origin=origin,
-                regions=[region],
-                verbose=False,
-                output_format='json'
+            result = await explore_run(
+                tfs_url=None,
+                tfs_blob=None,
+                origin_airport=origin,
+                region=region,
+                html_file=None,
+                use_browser=True,
+                enhanced_mode=False,
+                hl='en',
+                gl='us',
+                proxy=None,
+                max_bytes=100_000_000,
+                timeout=60.0,
+                verbose=False
             )
             
-            # Parse result
-            if isinstance(result, str):
-                result = json.loads(result)
-            
-            cards = result.get('deals', [])
+            # Result is a list of cards
+            cards = result if isinstance(result, list) else []
             
             # Add origin and search_region to each card
             for card in cards:
-                card['origin'] = origin
-                card['search_region'] = region
+                if isinstance(card, dict):
+                    card['origin'] = origin
+                    card['search_region'] = region
             
             all_cards.extend(cards)
             
@@ -229,7 +236,10 @@ async def run_test_phase(phase: int, verbose: bool = True):
     print(f"Total time:           {total_time:.1f}s ({total_time/60:.1f} min)")
     print(f"\nExpansions attempted: {len(expansion_candidates)}")
     print(f"Expansions succeeded: {len(results)}")
-    print(f"Success rate:         {len(results)/len(expansion_candidates)*100:.1f}%")
+    if len(expansion_candidates) > 0:
+        print(f"Success rate:         {len(results)/len(expansion_candidates)*100:.1f}%")
+    else:
+        print(f"Success rate:         N/A (no expansions attempted)")
     
     # Valid deals (after filtering)
     valid_deals = []
