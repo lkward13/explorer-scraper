@@ -19,12 +19,15 @@ import asyncio
 import argparse
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from datetime import datetime, date
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from explore_scraper.cli import run as explore_run
 from scripts.expand_dates import expand_dates
+from deal_models import ValidDeal, ExpandedRoute, DatePrice, FlightDetails, DealFilterConfig
+from deal_filters import compute_deal_metrics, is_valid_deal, compute_deal_score
 
 
 # Load city → IATA code mapping
@@ -36,6 +39,53 @@ try:
         CITY_TO_IATA = json.load(f)
 except FileNotFoundError:
     print(f"Warning: City→IATA mapping file not found: {CITY_TO_IATA_FILE}", file=sys.stderr)
+
+
+def dict_to_expanded_route(expansion_dict: Dict[str, Any]) -> ExpandedRoute:
+    """Convert raw expansion dict to ExpandedRoute model."""
+    
+    def parse_date_str(d):
+        if isinstance(d, str):
+            return date.fromisoformat(d)
+        return d
+    
+    similar_deals = [
+        DatePrice(
+            start_date=parse_date_str(d['start_date']),
+            end_date=parse_date_str(d['end_date']),
+            price=d['price']
+        )
+        for d in expansion_dict.get('similar_deals', [])
+    ]
+    
+    all_dates = [
+        DatePrice(
+            start_date=parse_date_str(d['start_date']),
+            end_date=parse_date_str(d['end_date']),
+            price=d['price']
+        )
+        for d in expansion_dict.get('all_dates', [])
+    ]
+    
+    flight_details_dict = expansion_dict.get('flight_details') or {}
+    flight_details = FlightDetails(**flight_details_dict) if flight_details_dict else FlightDetails()
+    
+    return ExpandedRoute(
+        origin=expansion_dict['origin'],
+        destination=expansion_dict['destination'],
+        actual_destination=expansion_dict.get('actual_destination'),
+        reference_price=expansion_dict['reference_price'],
+        reference_start=parse_date_str(expansion_dict['reference_start']),
+        reference_end=parse_date_str(expansion_dict['reference_end']),
+        threshold=expansion_dict.get('threshold', 0.10),
+        price_range=expansion_dict.get('price_range', {}),
+        similar_deals=similar_deals,
+        all_dates=all_dates,
+        deal_quality=expansion_dict.get('deal_quality'),
+        deal_quality_amount=expansion_dict.get('deal_quality_amount'),
+        flight_details=flight_details,
+        raw_responses=expansion_dict.get('raw_responses', [])
+    )
 
 
 async def find_and_expand_deals(
@@ -211,7 +261,7 @@ async def find_and_expand_deals(
                 print(f"[{deal_num}/{total_deals}] Expanding: {origin} → {destination} (${price})", file=sys.stderr)
             
             # Expand the deal to find flexible dates
-            expansion = await expand_dates(
+            expansion_dict = await expand_dates(
                 origin=origin,
                 destination=dest_code,
                 reference_start=start_date,
@@ -221,20 +271,33 @@ async def find_and_expand_deals(
                 verbose=False  # Don't spam logs
             )
             
-            # Check if deal has enough flexibility
-            similar_count = len(expansion['similar_deals'])
+            # Convert to typed model
+            expansion = dict_to_expanded_route(expansion_dict)
             
-            if similar_count >= min_similar_deals:
+            # Check if deal meets % off and flexibility thresholds
+            filter_config = DealFilterConfig()
+            
+            if is_valid_deal(expansion, filter_config):
+                metrics = compute_deal_metrics(expansion)
+                score = compute_deal_score(expansion, filter_config)
+                
                 if verbose:
-                    print(f"[✓] {destination}: {similar_count} similar dates - KEEPING", file=sys.stderr)
+                    discount_pct = int(metrics['discount_pct'] * 100)
+                    print(f"[✓] {destination}: {discount_pct}% off, {metrics['flex_count']} dates, score={score:.2f} - KEEPING", file=sys.stderr)
+                
                 return {
                     'explore_deal': deal,
                     'expansion': expansion,
-                    'similar_deals_count': similar_count
+                    'expansion_dict': expansion_dict,  # keep for JSON serialization
+                    'metrics': metrics,
+                    'score': score
                 }
             else:
+                metrics = compute_deal_metrics(expansion)
+                discount_pct = int(metrics['discount_pct'] * 100)
+                
                 if verbose:
-                    print(f"[✗] {destination}: {similar_count} similar dates - SKIPPING", file=sys.stderr)
+                    print(f"[✗] {destination}: {discount_pct}% off, {metrics['flex_count']} dates - BELOW THRESHOLD", file=sys.stderr)
                 return None
                 
         except Exception as e:
@@ -275,7 +338,18 @@ async def find_and_expand_deals(
         print(f"  Total destinations found: {len(explore_deals)}", file=sys.stderr)
         print(f"  Deals with valid dates: {len(valid_deals)}", file=sys.stderr)
         print(f"  Deals expanded: {len(deals_to_expand)}", file=sys.stderr)
-        print(f"  Deals with sufficient flexibility: {len(expanded_deals)}", file=sys.stderr)
+        print(f"  Valid deals (≥20% off, ≥5 dates): {len(expanded_deals)}", file=sys.stderr)
+        
+        # Show top deals
+        if expanded_deals:
+            print(f"\n  Top Deals:", file=sys.stderr)
+            sorted_deals = sorted(expanded_deals, key=lambda x: x['score'], reverse=True)
+            for i, deal in enumerate(sorted_deals[:5], 1):
+                metrics = deal['metrics']
+                dest = deal['explore_deal']['destination']
+                discount_pct = int(metrics['discount_pct'] * 100)
+                print(f"    {i}. {dest}: {discount_pct}% off, {metrics['flex_count']} dates, score={deal['score']:.2f}", file=sys.stderr)
+        
         print(f"{'='*60}\n", file=sys.stderr)
     
     return {
@@ -288,7 +362,7 @@ async def find_and_expand_deals(
             'total_destinations': len(explore_deals),
             'deals_with_dates': len(valid_deals),
             'deals_expanded': len(deals_to_expand),
-            'deals_with_flexibility': len(expanded_deals)
+            'valid_deals': len(expanded_deals)
         }
     }
 
@@ -341,13 +415,30 @@ Examples:
         )
     )
     
-    # Output results
+    # Output results (convert Pydantic models to dict for JSON)
+    def convert_to_json_serializable(obj):
+        """Convert Pydantic models and dates to JSON-serializable format."""
+        if hasattr(obj, 'model_dump'):
+            return obj.model_dump(mode='json')
+        elif isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        elif isinstance(obj, dict):
+            return {k: convert_to_json_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_to_json_serializable(item) for item in obj]
+        return obj
+    
+    # Convert result to JSON-serializable format
+    for deal in result['expanded_deals']:
+        if 'expansion' in deal and hasattr(deal['expansion'], 'model_dump'):
+            deal['expansion'] = deal['expansion'].model_dump(mode='json')
+    
     if args.out:
         with open(args.out, 'w') as f:
-            json.dump(result, f, indent=2)
+            json.dump(result, f, indent=2, default=str)
         print(f"✅ Saved to {args.out}")
     else:
-        print(json.dumps(result, indent=2))
+        print(json.dumps(result, indent=2, default=str))
 
 
 if __name__ == "__main__":

@@ -253,13 +253,18 @@ async def scrape_price_graph_data(
         
         page.on('response', handle_response)
         
+        # Initialize variables that will be set during scraping
+        actual_destination = None
+        deal_quality = None
+        deal_quality_amount = None
+        flight_details = None
+        
         try:
             # Navigate to flights page (dates already in URL via protobuf)
             await page.goto(url, wait_until="networkidle", timeout=timeout)
             await page.wait_for_timeout(5000)  # Let page fully load with results
             
             # Extract airport code from URL (in case city mapping is wrong)
-            actual_destination = None
             url_match = re.search(r'/flights/[A-Z]{3}-([A-Z]{3})', page.url)
             if url_match:
                 actual_destination = url_match.group(1)
@@ -267,8 +272,6 @@ async def scrape_price_graph_data(
                     print(f"[info] URL shows destination: {actual_destination} (input was: {destination})", file=sys.stderr)
             
             # Extract deal quality ("$X cheaper than usual")
-            deal_quality = None
-            deal_quality_amount = None
             try:
                 # Get page text and search for deal quality
                 page_text = await page.text_content("body")
@@ -299,7 +302,6 @@ async def scrape_price_graph_data(
                     print(f"[warn] Could not extract deal quality: {e}", file=sys.stderr)
             
             # Extract flight details from the page (best flight option)
-            flight_details = None
             try:
                 # Wait for flight results to load - look for the "Best" tab content
                 await page.wait_for_selector('text="Top departing flights"', timeout=5000)

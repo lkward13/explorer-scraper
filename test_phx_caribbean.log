@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/lukeward/Documents/Coding Projects/Explorer Scraper/scripts/find_and_expand_deals.py", line 31, in <module>
+    from deal_converter import classify_destination_region
+ImportError: cannot import name 'classify_destination_region' from 'deal_converter' (/Users/lukeward/Documents/Coding Projects/Explorer Scraper/deal_converter.py)
