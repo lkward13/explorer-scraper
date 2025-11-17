@@ -70,6 +70,13 @@ async def run(
                     region_key = region.lower().replace(" ", "_")
                     if region_key in region_data["regions"]:
                         tfs = region_data["regions"][region_key]
+                        
+                        # Check if TFS is null (collection failed)
+                        if tfs is None:
+                            print(f"[error] Region '{region}' TFS is null (collection failed)", file=sys.stderr)
+                            print(f"[info] Run: python scripts/collect_regions.py --origin {origin_airport} --regions \"{region}\"", file=sys.stderr)
+                            sys.exit(1)
+                        
                         if verbose:
                             print(f"[info] Using cached TFS for {origin_airport} → {region}", file=sys.stderr)
                     else:
