@@ -90,6 +90,7 @@ async def find_and_expand_deals(
                 origin_airport=origin,
                 region=None if region == "anywhere" else region,
                 html_file=None,
+                enhanced_mode=False,
                 use_browser=True,
                 hl="en",
                 gl="us",

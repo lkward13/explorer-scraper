@@ -16,7 +16,7 @@ async def fetch_html_browser(
     url: str,
     proxy: Optional[str] = None,
     timeout: float = 30.0,
-    headless: bool = False,
+    headless: bool = True,
 ) -> str:
     """
     Fetch HTML using Playwright browser automation.

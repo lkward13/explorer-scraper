@@ -9,6 +9,7 @@ from .tfs import extract_tfs_from_url, build_explore_url
 from .tfs_builder import build_tfs_from_airport_code
 from .fetch_http import fetch_html_stream
 from .fetch_browser import fetch_html_browser
+from .fetch_browser_enhanced import fetch_enhanced_cards
 from .parse_html import parse_cards_from_html
 
 
@@ -19,6 +20,7 @@ async def run(
     region: Optional[str],
     html_file: Optional[str],
     use_browser: bool,
+    enhanced_mode: bool,
     hl: str,
     gl: str,
     proxy: Optional[str],
@@ -114,16 +116,21 @@ async def run(
 
     try:
         # Choose fetch method
-        if use_browser:
+        if enhanced_mode:
+            # Enhanced mode: click cards to get airport codes and deal quality
+            if verbose:
+                print(f"[info] Using enhanced mode (clicking cards for details)", file=sys.stderr)
+            cards = await fetch_enhanced_cards(url, proxy=proxy, timeout=timeout, headless=True, verbose=verbose)
+        elif use_browser:
             html = await fetch_html_browser(url, proxy=proxy, timeout=timeout)
+            cards = parse_cards_from_html(html)
         else:
             html = await fetch_html_stream(url, proxy=proxy, timeout=timeout, max_bytes=max_bytes)
-        
-        cards = parse_cards_from_html(html)
+            cards = parse_cards_from_html(html)
         
         if not cards:
             print("[error] No destination cards found in response", file=sys.stderr)
-            if not use_browser:
+            if not use_browser and not enhanced_mode:
                 print("[info] Try using --use-browser to enable JavaScript rendering", file=sys.stderr)
             sys.exit(1)
         
@@ -159,6 +166,7 @@ def main():
     
     # Options
     p.add_argument("--use-browser", action="store_true", help="Use Playwright to render JavaScript (required for live scraping)")
+    p.add_argument("--enhanced", action="store_true", help="Enhanced mode: click cards to extract airport codes and deal quality (slower but more accurate)")
     p.add_argument("--hl", type=str, default="en", help="Language code (default: en)")
     p.add_argument("--gl", type=str, default="us", help="Region code (default: us)")
     p.add_argument("--proxy", type=str, default=None, help="HTTP/SOCKS proxy (format: http://host:port)")
@@ -182,6 +190,7 @@ def main():
             region=args.region,
             html_file=args.html_file,
             use_browser=args.use_browser,
+            enhanced_mode=args.enhanced,
             hl=args.hl,
             gl=args.gl,
             proxy=args.proxy,

@@ -210,7 +210,7 @@ async def scrape_price_graph_data(
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(
-            headless=False,  # Keep visible for debugging
+            headless=True,  # Headless mode for stability
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--disable-dev-shm-usage",
@@ -257,6 +257,46 @@ async def scrape_price_graph_data(
             # Navigate to flights page (dates already in URL via protobuf)
             await page.goto(url, wait_until="networkidle", timeout=timeout)
             await page.wait_for_timeout(5000)  # Let page fully load with results
+            
+            # Extract airport code from URL (in case city mapping is wrong)
+            actual_destination = None
+            url_match = re.search(r'/flights/[A-Z]{3}-([A-Z]{3})', page.url)
+            if url_match:
+                actual_destination = url_match.group(1)
+                if verbose and actual_destination != destination:
+                    print(f"[info] URL shows destination: {actual_destination} (input was: {destination})", file=sys.stderr)
+            
+            # Extract deal quality ("$X cheaper than usual")
+            deal_quality = None
+            deal_quality_amount = None
+            try:
+                # Get page text and search for deal quality
+                page_text = await page.text_content("body")
+                
+                # Look for patterns like "$267 cheaper than usual"
+                patterns = [
+                    r'\$(\d+)\s+cheaper\s+than\s+usual',
+                    r'\$(\d+)\s+cheaper',
+                    r'\$(\d+)\s+lower\s+than\s+usual',
+                    r'(\d+)%\s+cheaper\s+than\s+usual',
+                ]
+                
+                for pattern in patterns:
+                    match = re.search(pattern, page_text, re.IGNORECASE)
+                    if match:
+                        if '%' in pattern:
+                            deal_quality = f"{match.group(1)}% cheaper than usual"
+                            deal_quality_amount = None  # Percentage, not dollar amount
+                        else:
+                            deal_quality_amount = int(match.group(1))
+                            deal_quality = f"${deal_quality_amount} cheaper than usual"
+                        break
+                
+                if verbose and deal_quality:
+                    print(f"[info] Deal quality: {deal_quality}", file=sys.stderr)
+            except Exception as e:
+                if verbose:
+                    print(f"[warn] Could not extract deal quality: {e}", file=sys.stderr)
             
             # Save screenshot for debugging
             if verbose:
@@ -450,7 +490,10 @@ async def scrape_price_graph_data(
     # Return both API responses and DOM-scraped data
     return {
         'api_responses': price_data,
-        'dom_scraped': dom_scraped_data
+        'dom_scraped': dom_scraped_data,
+        'actual_destination': actual_destination,
+        'deal_quality': deal_quality,
+        'deal_quality_amount': deal_quality_amount
     }
 
 
@@ -539,6 +582,11 @@ async def expand_dates(
     Returns:
         Dict with reference deal and list of similar deals
     """
+    # Initialize variables that will be extracted from the page
+    actual_destination = None
+    deal_quality = None
+    deal_quality_amount = None
+    
     if verbose:
         print(f"\n{'='*60}", file=sys.stderr)
         print(f"Expanding dates for: {origin} → {destination}", file=sys.stderr)
@@ -557,6 +605,12 @@ async def expand_dates(
     result_data = await scrape_price_graph_data(
         origin, destination, reference_start, reference_end, verbose=verbose
     )
+    
+    # Extract metadata from result
+    if result_data:
+        actual_destination = result_data.get('actual_destination')
+        deal_quality = result_data.get('deal_quality')
+        deal_quality_amount = result_data.get('deal_quality_amount')
     
     if not result_data or not result_data.get('api_responses'):
         if verbose:
@@ -608,6 +662,7 @@ async def expand_dates(
     return {
         'origin': origin,
         'destination': destination,
+        'actual_destination': actual_destination,  # Airport code from URL
         'reference_price': reference_price,
         'reference_start': reference_start,
         'reference_end': reference_end,
@@ -615,6 +670,8 @@ async def expand_dates(
         'price_range': {'min': min_price, 'max': max_price},
         'similar_deals': similar_deals,
         'all_dates': unique_dates,  # Include ALL parsed data
+        'deal_quality': deal_quality,  # "$X cheaper than usual"
+        'deal_quality_amount': deal_quality_amount,  # Dollar amount
         'raw_responses': [{'url': r['url'], 'size': len(r['body'])} for r in result_data['api_responses']]
     }
 
