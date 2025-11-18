@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python worker/run_daily.py"
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
+startCommand = "python run_test.py"
+restartPolicyType = "never"
+restartPolicyMaxRetries = 0
 
