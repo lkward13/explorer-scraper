@@ -1,0 +1,1967 @@
+{
+  "origin": "OKC",
+  "destination": "DUB",
+  "actual_destination": null,
+  "reference_price": 428,
+  "reference_start": "2025-11-24",
+  "reference_end": "2025-12-03",
+  "threshold": 0.1,
+  "price_range": {
+    "min": 385,
+    "max": 470
+  },
+  "similar_deals": [
+    {
+      "start_date": "2025-11-17",
+      "end_date": "2025-11-26",
+      "price": 428
+    },
+    {
+      "start_date": "2025-11-18",
+      "end_date": "2025-11-27",
+      "price": 433
+    },
+    {
+      "start_date": "2025-11-24",
+      "end_date": "2025-12-03",
+      "price": 428
+    },
+    {
+      "start_date": "2025-11-25",
+      "end_date": "2025-12-04",
+      "price": 433
+    },
+    {
+      "start_date": "2025-11-26",
+      "end_date": "2025-12-05",
+      "price": 428
+    },
+    {
+      "start_date": "2025-12-01",
+      "end_date": "2025-12-10",
+      "price": 453
+    },
+    {
+      "start_date": "2025-12-02",
+      "end_date": "2025-12-11",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-03",
+      "end_date": "2025-12-12",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-06",
+      "end_date": "2025-12-15",
+      "price": 467
+    },
+    {
+      "start_date": "2025-12-07",
+      "end_date": "2025-12-16",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-08",
+      "end_date": "2025-12-17",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-07",
+      "end_date": "2026-01-16",
+      "price": 453
+    },
+    {
+      "start_date": "2026-01-11",
+      "end_date": "2026-01-20",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-12",
+      "end_date": "2026-01-21",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-13",
+      "end_date": "2026-01-22",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-14",
+      "end_date": "2026-01-23",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-17",
+      "end_date": "2026-01-26",
+      "price": 467
+    },
+    {
+      "start_date": "2026-01-18",
+      "end_date": "2026-01-27",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-19",
+      "end_date": "2026-01-28",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-20",
+      "end_date": "2026-01-29",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-21",
+      "end_date": "2026-01-30",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-24",
+      "end_date": "2026-02-02",
+      "price": 467
+    },
+    {
+      "start_date": "2026-01-25",
+      "end_date": "2026-02-03",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-26",
+      "end_date": "2026-02-04",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-27",
+      "end_date": "2026-02-05",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-28",
+      "end_date": "2026-02-06",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-31",
+      "end_date": "2026-02-09",
+      "price": 467
+    },
+    {
+      "start_date": "2026-02-01",
+      "end_date": "2026-02-10",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-02",
+      "end_date": "2026-02-11",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-03",
+      "end_date": "2026-02-12",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-04",
+      "end_date": "2026-02-13",
+      "price": 453
+    },
+    {
+      "start_date": "2026-02-08",
+      "end_date": "2026-02-17",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-09",
+      "end_date": "2026-02-18",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-10",
+      "end_date": "2026-02-19",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-11",
+      "end_date": "2026-02-20",
+      "price": 454
+    },
+    {
+      "start_date": "2026-02-15",
+      "end_date": "2026-02-24",
+      "price": 438
+    },
+    {
+      "start_date": "2026-02-16",
+      "end_date": "2026-02-25",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-17",
+      "end_date": "2026-02-26",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-18",
+      "end_date": "2026-02-27",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-22",
+      "end_date": "2026-03-03",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-23",
+      "end_date": "2026-03-04",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-24",
+      "end_date": "2026-03-05",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-25",
+      "end_date": "2026-03-06",
+      "price": 428
+    },
+    {
+      "start_date": "2026-03-01",
+      "end_date": "2026-03-10",
+      "price": 433
+    },
+    {
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-11",
+      "price": 457
+    },
+    {
+      "start_date": "2026-03-03",
+      "end_date": "2026-03-12",
+      "price": 457
+    },
+    {
+      "start_date": "2026-03-08",
+      "end_date": "2026-03-17",
+      "price": 458
+    },
+    {
+      "start_date": "2026-03-09",
+      "end_date": "2026-03-18",
+      "price": 463
+    }
+  ],
+  "all_dates": [
+    {
+      "start_date": "2025-11-17",
+      "end_date": "2025-11-26",
+      "price": 428
+    },
+    {
+      "start_date": "2025-11-18",
+      "end_date": "2025-11-27",
+      "price": 433
+    },
+    {
+      "start_date": "2025-11-19",
+      "end_date": "2025-11-28",
+      "price": 593
+    },
+    {
+      "start_date": "2025-11-20",
+      "end_date": "2025-11-29",
+      "price": 1096
+    },
+    {
+      "start_date": "2025-11-21",
+      "end_date": "2025-11-30",
+      "price": 2043
+    },
+    {
+      "start_date": "2025-11-22",
+      "end_date": "2025-12-01",
+      "price": 995
+    },
+    {
+      "start_date": "2025-11-23",
+      "end_date": "2025-12-02",
+      "price": 556
+    },
+    {
+      "start_date": "2025-11-24",
+      "end_date": "2025-12-03",
+      "price": 428
+    },
+    {
+      "start_date": "2025-11-25",
+      "end_date": "2025-12-04",
+      "price": 433
+    },
+    {
+      "start_date": "2025-11-26",
+      "end_date": "2025-12-05",
+      "price": 428
+    },
+    {
+      "start_date": "2025-11-27",
+      "end_date": "2025-12-06",
+      "price": 478
+    },
+    {
+      "start_date": "2025-11-28",
+      "end_date": "2025-12-07",
+      "price": 478
+    },
+    {
+      "start_date": "2025-11-29",
+      "end_date": "2025-12-08",
+      "price": 482
+    },
+    {
+      "start_date": "2025-11-30",
+      "end_date": "2025-12-09",
+      "price": 488
+    },
+    {
+      "start_date": "2025-12-01",
+      "end_date": "2025-12-10",
+      "price": 453
+    },
+    {
+      "start_date": "2025-12-02",
+      "end_date": "2025-12-11",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-03",
+      "end_date": "2025-12-12",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-04",
+      "end_date": "2025-12-13",
+      "price": 483
+    },
+    {
+      "start_date": "2025-12-05",
+      "end_date": "2025-12-14",
+      "price": 483
+    },
+    {
+      "start_date": "2025-12-06",
+      "end_date": "2025-12-15",
+      "price": 467
+    },
+    {
+      "start_date": "2025-12-07",
+      "end_date": "2025-12-16",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-08",
+      "end_date": "2025-12-17",
+      "price": 433
+    },
+    {
+      "start_date": "2025-12-09",
+      "end_date": "2025-12-18",
+      "price": 688
+    },
+    {
+      "start_date": "2025-12-10",
+      "end_date": "2025-12-19",
+      "price": 837
+    },
+    {
+      "start_date": "2025-12-11",
+      "end_date": "2025-12-20",
+      "price": 813
+    },
+    {
+      "start_date": "2025-12-12",
+      "end_date": "2025-12-21",
+      "price": 763
+    },
+    {
+      "start_date": "2025-12-13",
+      "end_date": "2025-12-22",
+      "price": 631
+    },
+    {
+      "start_date": "2025-12-14",
+      "end_date": "2025-12-23",
+      "price": 691
+    },
+    {
+      "start_date": "2025-12-15",
+      "end_date": "2025-12-24",
+      "price": 603
+    },
+    {
+      "start_date": "2025-12-17",
+      "end_date": "2025-12-26",
+      "price": 816
+    },
+    {
+      "start_date": "2025-12-18",
+      "end_date": "2025-12-27",
+      "price": 1034
+    },
+    {
+      "start_date": "2025-12-19",
+      "end_date": "2025-12-28",
+      "price": 1263
+    },
+    {
+      "start_date": "2025-12-20",
+      "end_date": "2025-12-29",
+      "price": 1294
+    },
+    {
+      "start_date": "2025-12-21",
+      "end_date": "2025-12-30",
+      "price": 1074
+    },
+    {
+      "start_date": "2025-12-22",
+      "end_date": "2025-12-31",
+      "price": 1158
+    },
+    {
+      "start_date": "2025-12-23",
+      "end_date": "2026-01-01",
+      "price": 1023
+    },
+    {
+      "start_date": "2025-12-24",
+      "end_date": "2026-01-02",
+      "price": 1732
+    },
+    {
+      "start_date": "2025-12-25",
+      "end_date": "2026-01-03",
+      "price": 1245
+    },
+    {
+      "start_date": "2025-12-26",
+      "end_date": "2026-01-04",
+      "price": 1490
+    },
+    {
+      "start_date": "2025-12-27",
+      "end_date": "2026-01-05",
+      "price": 1240
+    },
+    {
+      "start_date": "2025-12-28",
+      "end_date": "2026-01-06",
+      "price": 725
+    },
+    {
+      "start_date": "2025-12-29",
+      "end_date": "2026-01-07",
+      "price": 698
+    },
+    {
+      "start_date": "2025-12-30",
+      "end_date": "2026-01-08",
+      "price": 580
+    },
+    {
+      "start_date": "2025-12-31",
+      "end_date": "2026-01-09",
+      "price": 559
+    },
+    {
+      "start_date": "2026-01-01",
+      "end_date": "2026-01-10",
+      "price": 652
+    },
+    {
+      "start_date": "2026-01-02",
+      "end_date": "2026-01-11",
+      "price": 793
+    },
+    {
+      "start_date": "2026-01-03",
+      "end_date": "2026-01-12",
+      "price": 800
+    },
+    {
+      "start_date": "2026-01-04",
+      "end_date": "2026-01-13",
+      "price": 637
+    },
+    {
+      "start_date": "2026-01-05",
+      "end_date": "2026-01-14",
+      "price": 483
+    },
+    {
+      "start_date": "2026-01-06",
+      "end_date": "2026-01-15",
+      "price": 524
+    },
+    {
+      "start_date": "2026-01-07",
+      "end_date": "2026-01-16",
+      "price": 453
+    },
+    {
+      "start_date": "2026-01-08",
+      "end_date": "2026-01-17",
+      "price": 485
+    },
+    {
+      "start_date": "2026-01-09",
+      "end_date": "2026-01-18",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-10",
+      "end_date": "2026-01-19",
+      "price": 553
+    },
+    {
+      "start_date": "2026-01-11",
+      "end_date": "2026-01-20",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-12",
+      "end_date": "2026-01-21",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-13",
+      "end_date": "2026-01-22",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-14",
+      "end_date": "2026-01-23",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-15",
+      "end_date": "2026-01-24",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-16",
+      "end_date": "2026-01-25",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-17",
+      "end_date": "2026-01-26",
+      "price": 467
+    },
+    {
+      "start_date": "2026-01-18",
+      "end_date": "2026-01-27",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-19",
+      "end_date": "2026-01-28",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-20",
+      "end_date": "2026-01-29",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-21",
+      "end_date": "2026-01-30",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-22",
+      "end_date": "2026-01-31",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-23",
+      "end_date": "2026-02-01",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-24",
+      "end_date": "2026-02-02",
+      "price": 467
+    },
+    {
+      "start_date": "2026-01-25",
+      "end_date": "2026-02-03",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-26",
+      "end_date": "2026-02-04",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-27",
+      "end_date": "2026-02-05",
+      "price": 433
+    },
+    {
+      "start_date": "2026-01-28",
+      "end_date": "2026-02-06",
+      "price": 428
+    },
+    {
+      "start_date": "2026-01-29",
+      "end_date": "2026-02-07",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-08",
+      "price": 478
+    },
+    {
+      "start_date": "2026-01-31",
+      "end_date": "2026-02-09",
+      "price": 467
+    },
+    {
+      "start_date": "2026-02-01",
+      "end_date": "2026-02-10",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-02",
+      "end_date": "2026-02-11",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-03",
+      "end_date": "2026-02-12",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-04",
+      "end_date": "2026-02-13",
+      "price": 453
+    },
+    {
+      "start_date": "2026-02-05",
+      "end_date": "2026-02-14",
+      "price": 488
+    },
+    {
+      "start_date": "2026-02-06",
+      "end_date": "2026-02-15",
+      "price": 478
+    },
+    {
+      "start_date": "2026-02-07",
+      "end_date": "2026-02-16",
+      "price": 480
+    },
+    {
+      "start_date": "2026-02-08",
+      "end_date": "2026-02-17",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-09",
+      "end_date": "2026-02-18",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-10",
+      "end_date": "2026-02-19",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-11",
+      "end_date": "2026-02-20",
+      "price": 454
+    },
+    {
+      "start_date": "2026-02-12",
+      "end_date": "2026-02-21",
+      "price": 478
+    },
+    {
+      "start_date": "2026-02-13",
+      "end_date": "2026-02-22",
+      "price": 478
+    },
+    {
+      "start_date": "2026-02-14",
+      "end_date": "2026-02-23",
+      "price": 478
+    },
+    {
+      "start_date": "2026-02-15",
+      "end_date": "2026-02-24",
+      "price": 438
+    },
+    {
+      "start_date": "2026-02-16",
+      "end_date": "2026-02-25",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-17",
+      "end_date": "2026-02-26",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-18",
+      "end_date": "2026-02-27",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-19",
+      "end_date": "2026-02-28",
+      "price": 478
+    },
+    {
+      "start_date": "2026-02-20",
+      "end_date": "2026-03-01",
+      "price": 519
+    },
+    {
+      "start_date": "2026-02-21",
+      "end_date": "2026-03-02",
+      "price": 508
+    },
+    {
+      "start_date": "2026-02-22",
+      "end_date": "2026-03-03",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-23",
+      "end_date": "2026-03-04",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-24",
+      "end_date": "2026-03-05",
+      "price": 433
+    },
+    {
+      "start_date": "2026-02-25",
+      "end_date": "2026-03-06",
+      "price": 428
+    },
+    {
+      "start_date": "2026-02-26",
+      "end_date": "2026-03-07",
+      "price": 503
+    },
+    {
+      "start_date": "2026-02-27",
+      "end_date": "2026-03-08",
+      "price": 508
+    },
+    {
+      "start_date": "2026-02-28",
+      "end_date": "2026-03-09",
+      "price": 492
+    },
+    {
+      "start_date": "2026-03-01",
+      "end_date": "2026-03-10",
+      "price": 433
+    },
+    {
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-11",
+      "price": 457
+    },
+    {
+      "start_date": "2026-03-03",
+      "end_date": "2026-03-12",
+      "price": 457
+    },
+    {
+      "start_date": "2026-03-04",
+      "end_date": "2026-03-13",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-05",
+      "end_date": "2026-03-14",
+      "price": 580
+    },
+    {
+      "start_date": "2026-03-06",
+      "end_date": "2026-03-15",
+      "price": 660
+    },
+    {
+      "start_date": "2026-03-07",
+      "end_date": "2026-03-16",
+      "price": 558
+    },
+    {
+      "start_date": "2026-03-08",
+      "end_date": "2026-03-17",
+      "price": 458
+    },
+    {
+      "start_date": "2026-03-09",
+      "end_date": "2026-03-18",
+      "price": 463
+    },
+    {
+      "start_date": "2026-03-10",
+      "end_date": "2026-03-19",
+      "price": 544
+    },
+    {
+      "start_date": "2026-03-11",
+      "end_date": "2026-03-20",
+      "price": 703
+    },
+    {
+      "start_date": "2026-03-12",
+      "end_date": "2026-03-21",
+      "price": 989
+    },
+    {
+      "start_date": "2026-03-13",
+      "end_date": "2026-03-22",
+      "price": 1189
+    },
+    {
+      "start_date": "2026-03-14",
+      "end_date": "2026-03-23",
+      "price": 891
+    },
+    {
+      "start_date": "2026-03-15",
+      "end_date": "2026-03-24",
+      "price": 722
+    },
+    {
+      "start_date": "2026-03-16",
+      "end_date": "2026-03-25",
+      "price": 488
+    },
+    {
+      "start_date": "2026-03-17",
+      "end_date": "2026-03-26",
+      "price": 480
+    },
+    {
+      "start_date": "2026-03-18",
+      "end_date": "2026-03-27",
+      "price": 544
+    },
+    {
+      "start_date": "2026-03-19",
+      "end_date": "2026-03-28",
+      "price": 707
+    },
+    {
+      "start_date": "2026-03-20",
+      "end_date": "2026-03-29",
+      "price": 580
+    },
+    {
+      "start_date": "2026-03-21",
+      "end_date": "2026-03-30",
+      "price": 582
+    },
+    {
+      "start_date": "2026-03-22",
+      "end_date": "2026-03-31",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-23",
+      "end_date": "2026-04-01",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-24",
+      "end_date": "2026-04-02",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-25",
+      "end_date": "2026-04-03",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-26",
+      "end_date": "2026-04-04",
+      "price": 578
+    },
+    {
+      "start_date": "2026-03-27",
+      "end_date": "2026-04-05",
+      "price": 578
+    },
+    {
+      "start_date": "2026-03-28",
+      "end_date": "2026-04-06",
+      "price": 578
+    },
+    {
+      "start_date": "2026-03-29",
+      "end_date": "2026-04-07",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-30",
+      "end_date": "2026-04-08",
+      "price": 478
+    },
+    {
+      "start_date": "2026-03-31",
+      "end_date": "2026-04-09",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-01",
+      "end_date": "2026-04-10",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-02",
+      "end_date": "2026-04-11",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-03",
+      "end_date": "2026-04-12",
+      "price": 584
+    },
+    {
+      "start_date": "2026-04-04",
+      "end_date": "2026-04-13",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-05",
+      "end_date": "2026-04-14",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-06",
+      "end_date": "2026-04-15",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-07",
+      "end_date": "2026-04-16",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-08",
+      "end_date": "2026-04-17",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-09",
+      "end_date": "2026-04-18",
+      "price": 582
+    },
+    {
+      "start_date": "2026-04-10",
+      "end_date": "2026-04-19",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-11",
+      "end_date": "2026-04-20",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-12",
+      "end_date": "2026-04-21",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-13",
+      "end_date": "2026-04-22",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-14",
+      "end_date": "2026-04-23",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-15",
+      "end_date": "2026-04-24",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-16",
+      "end_date": "2026-04-25",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-17",
+      "end_date": "2026-04-26",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-18",
+      "end_date": "2026-04-27",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-19",
+      "end_date": "2026-04-28",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-20",
+      "end_date": "2026-04-29",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-21",
+      "end_date": "2026-04-30",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-22",
+      "end_date": "2026-05-01",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-23",
+      "end_date": "2026-05-02",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-24",
+      "end_date": "2026-05-03",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-25",
+      "end_date": "2026-05-04",
+      "price": 578
+    },
+    {
+      "start_date": "2026-04-26",
+      "end_date": "2026-05-05",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-27",
+      "end_date": "2026-05-06",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-28",
+      "end_date": "2026-05-07",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-29",
+      "end_date": "2026-05-08",
+      "price": 478
+    },
+    {
+      "start_date": "2026-04-30",
+      "end_date": "2026-05-09",
+      "price": 578
+    },
+    {
+      "start_date": "2026-05-01",
+      "end_date": "2026-05-10",
+      "price": 578
+    },
+    {
+      "start_date": "2026-05-02",
+      "end_date": "2026-05-11",
+      "price": 578
+    },
+    {
+      "start_date": "2026-05-03",
+      "end_date": "2026-05-12",
+      "price": 478
+    },
+    {
+      "start_date": "2026-05-04",
+      "end_date": "2026-05-13",
+      "price": 478
+    },
+    {
+      "start_date": "2026-05-05",
+      "end_date": "2026-05-14",
+      "price": 488
+    },
+    {
+      "start_date": "2026-05-06",
+      "end_date": "2026-05-15",
+      "price": 593
+    },
+    {
+      "start_date": "2026-05-07",
+      "end_date": "2026-05-16",
+      "price": 703
+    },
+    {
+      "start_date": "2026-05-08",
+      "end_date": "2026-05-17",
+      "price": 727
+    },
+    {
+      "start_date": "2026-05-09",
+      "end_date": "2026-05-18",
+      "price": 703
+    },
+    {
+      "start_date": "2026-05-10",
+      "end_date": "2026-05-19",
+      "price": 598
+    },
+    {
+      "start_date": "2026-05-11",
+      "end_date": "2026-05-20",
+      "price": 593
+    },
+    {
+      "start_date": "2026-05-12",
+      "end_date": "2026-05-21",
+      "price": 608
+    },
+    {
+      "start_date": "2026-05-13",
+      "end_date": "2026-05-22",
+      "price": 741
+    },
+    {
+      "start_date": "2026-05-14",
+      "end_date": "2026-05-23",
+      "price": 827
+    },
+    {
+      "start_date": "2026-05-15",
+      "end_date": "2026-05-24",
+      "price": 837
+    },
+    {
+      "start_date": "2026-05-16",
+      "end_date": "2026-05-25",
+      "price": 827
+    },
+    {
+      "start_date": "2026-05-17",
+      "end_date": "2026-05-26",
+      "price": 712
+    },
+    {
+      "start_date": "2026-05-18",
+      "end_date": "2026-05-27",
+      "price": 717
+    },
+    {
+      "start_date": "2026-05-19",
+      "end_date": "2026-05-28",
+      "price": 737
+    },
+    {
+      "start_date": "2026-05-20",
+      "end_date": "2026-05-29",
+      "price": 737
+    },
+    {
+      "start_date": "2026-05-21",
+      "end_date": "2026-05-30",
+      "price": 892
+    },
+    {
+      "start_date": "2026-05-22",
+      "end_date": "2026-05-31",
+      "price": 857
+    },
+    {
+      "start_date": "2026-05-23",
+      "end_date": "2026-06-01",
+      "price": 857
+    },
+    {
+      "start_date": "2026-05-24",
+      "end_date": "2026-06-02",
+      "price": 743
+    },
+    {
+      "start_date": "2026-05-25",
+      "end_date": "2026-06-03",
+      "price": 737
+    },
+    {
+      "start_date": "2026-05-26",
+      "end_date": "2026-06-04",
+      "price": 737
+    },
+    {
+      "start_date": "2026-05-27",
+      "end_date": "2026-06-05",
+      "price": 737
+    },
+    {
+      "start_date": "2026-05-28",
+      "end_date": "2026-06-06",
+      "price": 857
+    },
+    {
+      "start_date": "2026-05-29",
+      "end_date": "2026-06-07",
+      "price": 922
+    },
+    {
+      "start_date": "2026-05-30",
+      "end_date": "2026-06-08",
+      "price": 857
+    },
+    {
+      "start_date": "2026-05-31",
+      "end_date": "2026-06-09",
+      "price": 737
+    },
+    {
+      "start_date": "2026-06-01",
+      "end_date": "2026-06-10",
+      "price": 911
+    },
+    {
+      "start_date": "2026-06-02",
+      "end_date": "2026-06-11",
+      "price": 911
+    },
+    {
+      "start_date": "2026-06-03",
+      "end_date": "2026-06-12",
+      "price": 1015
+    },
+    {
+      "start_date": "2026-06-04",
+      "end_date": "2026-06-13",
+      "price": 1084
+    },
+    {
+      "start_date": "2026-06-05",
+      "end_date": "2026-06-14",
+      "price": 1086
+    },
+    {
+      "start_date": "2026-06-06",
+      "end_date": "2026-06-15",
+      "price": 1156
+    },
+    {
+      "start_date": "2026-06-07",
+      "end_date": "2026-06-16",
+      "price": 952
+    },
+    {
+      "start_date": "2026-06-08",
+      "end_date": "2026-06-17",
+      "price": 925
+    },
+    {
+      "start_date": "2026-06-09",
+      "end_date": "2026-06-18",
+      "price": 911
+    },
+    {
+      "start_date": "2026-06-10",
+      "end_date": "2026-06-19",
+      "price": 1018
+    },
+    {
+      "start_date": "2026-06-11",
+      "end_date": "2026-06-20",
+      "price": 1145
+    },
+    {
+      "start_date": "2026-06-12",
+      "end_date": "2026-06-21",
+      "price": 1231
+    },
+    {
+      "start_date": "2026-06-13",
+      "end_date": "2026-06-22",
+      "price": 1215
+    },
+    {
+      "start_date": "2026-06-14",
+      "end_date": "2026-06-23",
+      "price": 1061
+    },
+    {
+      "start_date": "2026-06-15",
+      "end_date": "2026-06-24",
+      "price": 1061
+    },
+    {
+      "start_date": "2026-06-16",
+      "end_date": "2026-06-25",
+      "price": 1062
+    },
+    {
+      "start_date": "2026-06-17",
+      "end_date": "2026-06-26",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-06-18",
+      "end_date": "2026-06-27",
+      "price": 1205
+    },
+    {
+      "start_date": "2026-06-19",
+      "end_date": "2026-06-28",
+      "price": 1225
+    },
+    {
+      "start_date": "2026-06-20",
+      "end_date": "2026-06-29",
+      "price": 1202
+    },
+    {
+      "start_date": "2026-06-21",
+      "end_date": "2026-06-30",
+      "price": 1062
+    },
+    {
+      "start_date": "2026-06-22",
+      "end_date": "2026-07-01",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-06-23",
+      "end_date": "2026-07-02",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-06-24",
+      "end_date": "2026-07-03",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-06-25",
+      "end_date": "2026-07-04",
+      "price": 1301
+    },
+    {
+      "start_date": "2026-06-26",
+      "end_date": "2026-07-05",
+      "price": 1225
+    },
+    {
+      "start_date": "2026-06-27",
+      "end_date": "2026-07-06",
+      "price": 1205
+    },
+    {
+      "start_date": "2026-06-28",
+      "end_date": "2026-07-07",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-06-29",
+      "end_date": "2026-07-08",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-06-30",
+      "end_date": "2026-07-09",
+      "price": 1061
+    },
+    {
+      "start_date": "2026-07-01",
+      "end_date": "2026-07-10",
+      "price": 1065
+    },
+    {
+      "start_date": "2026-07-02",
+      "end_date": "2026-07-11",
+      "price": 1209
+    },
+    {
+      "start_date": "2026-07-03",
+      "end_date": "2026-07-12",
+      "price": 1205
+    },
+    {
+      "start_date": "2026-07-04",
+      "end_date": "2026-07-13",
+      "price": 1021
+    },
+    {
+      "start_date": "2026-07-05",
+      "end_date": "2026-07-14",
+      "price": 891
+    },
+    {
+      "start_date": "2026-07-06",
+      "end_date": "2026-07-15",
+      "price": 891
+    },
+    {
+      "start_date": "2026-07-07",
+      "end_date": "2026-07-16",
+      "price": 891
+    },
+    {
+      "start_date": "2026-07-08",
+      "end_date": "2026-07-17",
+      "price": 891
+    },
+    {
+      "start_date": "2026-07-09",
+      "end_date": "2026-07-18",
+      "price": 1051
+    },
+    {
+      "start_date": "2026-07-10",
+      "end_date": "2026-07-19",
+      "price": 1061
+    },
+    {
+      "start_date": "2026-07-11",
+      "end_date": "2026-07-20",
+      "price": 837
+    },
+    {
+      "start_date": "2026-07-12",
+      "end_date": "2026-07-21",
+      "price": 737
+    },
+    {
+      "start_date": "2026-07-13",
+      "end_date": "2026-07-22",
+      "price": 747
+    },
+    {
+      "start_date": "2026-07-14",
+      "end_date": "2026-07-23",
+      "price": 737
+    },
+    {
+      "start_date": "2026-07-15",
+      "end_date": "2026-07-24",
+      "price": 742
+    },
+    {
+      "start_date": "2026-07-16",
+      "end_date": "2026-07-25",
+      "price": 871
+    },
+    {
+      "start_date": "2026-07-17",
+      "end_date": "2026-07-26",
+      "price": 894
+    },
+    {
+      "start_date": "2026-07-18",
+      "end_date": "2026-07-27",
+      "price": 857
+    },
+    {
+      "start_date": "2026-07-19",
+      "end_date": "2026-07-28",
+      "price": 742
+    },
+    {
+      "start_date": "2026-07-20",
+      "end_date": "2026-07-29",
+      "price": 743
+    },
+    {
+      "start_date": "2026-07-21",
+      "end_date": "2026-07-30",
+      "price": 737
+    },
+    {
+      "start_date": "2026-07-22",
+      "end_date": "2026-07-31",
+      "price": 742
+    },
+    {
+      "start_date": "2026-07-23",
+      "end_date": "2026-08-01",
+      "price": 862
+    },
+    {
+      "start_date": "2026-07-24",
+      "end_date": "2026-08-02",
+      "price": 867
+    },
+    {
+      "start_date": "2026-07-25",
+      "end_date": "2026-08-03",
+      "price": 863
+    },
+    {
+      "start_date": "2026-07-26",
+      "end_date": "2026-08-04",
+      "price": 747
+    },
+    {
+      "start_date": "2026-07-27",
+      "end_date": "2026-08-05",
+      "price": 593
+    },
+    {
+      "start_date": "2026-07-28",
+      "end_date": "2026-08-06",
+      "price": 598
+    },
+    {
+      "start_date": "2026-07-29",
+      "end_date": "2026-08-07",
+      "price": 598
+    },
+    {
+      "start_date": "2026-07-30",
+      "end_date": "2026-08-08",
+      "price": 713
+    },
+    {
+      "start_date": "2026-07-31",
+      "end_date": "2026-08-09",
+      "price": 703
+    },
+    {
+      "start_date": "2026-08-01",
+      "end_date": "2026-08-10",
+      "price": 709
+    },
+    {
+      "start_date": "2026-08-02",
+      "end_date": "2026-08-11",
+      "price": 593
+    },
+    {
+      "start_date": "2026-08-03",
+      "end_date": "2026-08-12",
+      "price": 593
+    },
+    {
+      "start_date": "2026-08-04",
+      "end_date": "2026-08-13",
+      "price": 593
+    },
+    {
+      "start_date": "2026-08-05",
+      "end_date": "2026-08-14",
+      "price": 603
+    },
+    {
+      "start_date": "2026-08-06",
+      "end_date": "2026-08-15",
+      "price": 703
+    },
+    {
+      "start_date": "2026-08-07",
+      "end_date": "2026-08-16",
+      "price": 737
+    },
+    {
+      "start_date": "2026-08-09",
+      "end_date": "2026-08-18",
+      "price": 593
+    },
+    {
+      "start_date": "2026-08-12",
+      "end_date": "2026-08-21",
+      "price": 488
+    },
+    {
+      "start_date": "2026-08-08",
+      "end_date": "2026-08-17",
+      "price": 713
+    },
+    {
+      "start_date": "2026-08-11",
+      "end_date": "2026-08-20",
+      "price": 478
+    },
+    {
+      "start_date": "2026-08-10",
+      "end_date": "2026-08-19",
+      "price": 478
+    },
+    {
+      "start_date": "2026-08-13",
+      "end_date": "2026-08-22",
+      "price": 578
+    },
+    {
+      "start_date": "2026-08-22",
+      "end_date": "2026-08-31",
+      "price": 739
+    },
+    {
+      "start_date": "2026-08-30",
+      "end_date": "2026-09-08",
+      "price": 707
+    },
+    {
+      "start_date": "2026-08-18",
+      "end_date": "2026-08-27",
+      "price": 593
+    },
+    {
+      "start_date": "2026-08-29",
+      "end_date": "2026-09-07",
+      "price": 827
+    },
+    {
+      "start_date": "2026-08-28",
+      "end_date": "2026-09-06",
+      "price": 836
+    },
+    {
+      "start_date": "2026-08-19",
+      "end_date": "2026-08-28",
+      "price": 663
+    },
+    {
+      "start_date": "2026-09-02",
+      "end_date": "2026-09-11",
+      "price": 603
+    },
+    {
+      "start_date": "2026-08-16",
+      "end_date": "2026-08-25",
+      "price": 478
+    },
+    {
+      "start_date": "2026-08-20",
+      "end_date": "2026-08-29",
+      "price": 703
+    },
+    {
+      "start_date": "2026-08-23",
+      "end_date": "2026-09-01",
+      "price": 593
+    },
+    {
+      "start_date": "2026-09-01",
+      "end_date": "2026-09-10",
+      "price": 593
+    },
+    {
+      "start_date": "2026-08-15",
+      "end_date": "2026-08-24",
+      "price": 588
+    },
+    {
+      "start_date": "2026-08-17",
+      "end_date": "2026-08-26",
+      "price": 478
+    },
+    {
+      "start_date": "2026-08-21",
+      "end_date": "2026-08-30",
+      "price": 849
+    },
+    {
+      "start_date": "2026-08-14",
+      "end_date": "2026-08-23",
+      "price": 603
+    },
+    {
+      "start_date": "2026-08-24",
+      "end_date": "2026-09-02",
+      "price": 528
+    },
+    {
+      "start_date": "2026-08-25",
+      "end_date": "2026-09-03",
+      "price": 601
+    },
+    {
+      "start_date": "2026-09-03",
+      "end_date": "2026-09-12",
+      "price": 706
+    },
+    {
+      "start_date": "2026-08-27",
+      "end_date": "2026-09-05",
+      "price": 727
+    },
+    {
+      "start_date": "2026-08-26",
+      "end_date": "2026-09-04",
+      "price": 728
+    },
+    {
+      "start_date": "2026-08-31",
+      "end_date": "2026-09-09",
+      "price": 528
+    },
+    {
+      "start_date": "2026-09-21",
+      "end_date": "2026-09-30",
+      "price": 528
+    },
+    {
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-21",
+      "price": 713
+    },
+    {
+      "start_date": "2026-09-11",
+      "end_date": "2026-09-20",
+      "price": 586
+    },
+    {
+      "start_date": "2026-09-08",
+      "end_date": "2026-09-17",
+      "price": 601
+    },
+    {
+      "start_date": "2026-09-04",
+      "end_date": "2026-09-13",
+      "price": 736
+    },
+    {
+      "start_date": "2026-09-24",
+      "end_date": "2026-10-03",
+      "price": 837
+    },
+    {
+      "start_date": "2026-09-13",
+      "end_date": "2026-09-22",
+      "price": 601
+    },
+    {
+      "start_date": "2026-09-19",
+      "end_date": "2026-09-28",
+      "price": 837
+    },
+    {
+      "start_date": "2026-09-05",
+      "end_date": "2026-09-14",
+      "price": 780
+    },
+    {
+      "start_date": "2026-09-10",
+      "end_date": "2026-09-19",
+      "price": 616
+    },
+    {
+      "start_date": "2026-09-18",
+      "end_date": "2026-09-27",
+      "price": 756
+    },
+    {
+      "start_date": "2026-09-06",
+      "end_date": "2026-09-15",
+      "price": 593
+    },
+    {
+      "start_date": "2026-09-16",
+      "end_date": "2026-09-25",
+      "price": 717
+    },
+    {
+      "start_date": "2026-09-17",
+      "end_date": "2026-09-26",
+      "price": 837
+    },
+    {
+      "start_date": "2026-09-15",
+      "end_date": "2026-09-24",
+      "price": 717
+    },
+    {
+      "start_date": "2026-09-23",
+      "end_date": "2026-10-02",
+      "price": 717
+    },
+    {
+      "start_date": "2026-09-07",
+      "end_date": "2026-09-16",
+      "price": 601
+    },
+    {
+      "start_date": "2026-09-09",
+      "end_date": "2026-09-18",
+      "price": 603
+    },
+    {
+      "start_date": "2026-09-14",
+      "end_date": "2026-09-23",
+      "price": 603
+    },
+    {
+      "start_date": "2026-09-22",
+      "end_date": "2026-10-01",
+      "price": 717
+    },
+    {
+      "start_date": "2026-09-20",
+      "end_date": "2026-09-29",
+      "price": 715
+    }
+  ],
+  "deal_quality": null,
+  "deal_quality_amount": null,
+  "flight_details": {
+    "airline": "United",
+    "duration": "18h 30m",
+    "stops": 1,
+    "departure_time": "7:40 AM",
+    "arrival_time": "7:40 AM"
+  },
+  "raw_responses": [
+    {
+      "url": "https://www.google.com/travel/flights?tfs=GhoSCjIwMjUtMTEtMjRqBRIDT0tDcgUSA0RVQhoaEgoyMDI1LTEyLTAzagUSA0RVQnIFEgNPS0NCAQFIAZgBAQ&hl=en&gl=us",
+      "size": 2241318
+    },
+    {
+      "url": "https://apis.google.com/_/scs/abc-static/_/js/k=gapi.gapi.en.UXDNXkgCDpE.O/m=gapi_iframes,googleapis_client/rt=j/sv=1/d=1/ed=1/rs=AHpOoo_3ykjRTrvlIBv6vfu43Rx7CYUQSA/cb=gapi.loaded_0",
+      "size": 118202
+    },
+    {
+      "url": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
+      "size": 53
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/bscframe",
+      "size": 15
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetShoppingResults?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=82584&rt=c",
+      "size": 104538
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://play.google.com/log?format=json&hasfast=true",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/browserinfo?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=182584&rt=j",
+      "size": 91
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=282584&rt=c",
+      "size": 10394
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=382584&rt=c",
+      "size": 3769
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=482584&rt=c",
+      "size": 3769
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=582584&rt=c",
+      "size": 3764
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=682584&rt=c",
+      "size": 3849
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=782584&rt=c",
+      "size": 3978
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=882584&rt=c",
+      "size": 3977
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=982584&rt=c",
+      "size": 3985
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=1082584&rt=c",
+      "size": 3999
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=1182584&rt=c",
+      "size": 3982
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=1282584&rt=c",
+      "size": 5309
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=1382584&rt=c",
+      "size": 7994
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=-3930452674046365189&bl=boq_travel-frontend-flights-ui_20251112.01_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=1482584&rt=c",
+      "size": 7995
+    },
+    {
+      "url": "https://play.google.com/log?hasfast=true&authuser=0&format=json",
+      "size": 131
+    },
+    {
+      "url": "https://www.google.com/log?format=json&hasfast=true",
+      "size": 131
+    }
+  ]
+}

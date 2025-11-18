@@ -1,0 +1,53 @@
+{
+  "origin": "PHX",
+  "origin_airport_name": null,
+  "week_of": "2025-11-17",
+  "bundles": [],
+  "single_deals": [
+    {
+      "bundle_type": "single",
+      "title": "Tahiti from PHX – 28% off",
+      "deal": {
+        "deal_id": "phx-ppt-20251129",
+        "origin": "PHX",
+        "origin_airport_name": null,
+        "destination_airport": "PPT",
+        "destination_city": "Tahiti",
+        "destination_country": "PF",
+        "destination_region": "oceania",
+        "reference_price": 952,
+        "usual_price_estimate": 1340,
+        "discount_amount": 388,
+        "discount_pct": 0.28955223880597014,
+        "similar_dates_count": 20,
+        "first_travel_date": "2025-11-29",
+        "last_travel_date": "2026-05-26",
+        "deal_quality_text": "$388 cheaper than usual",
+        "flight_details": {
+          "airline": "Alaska",
+          "duration": "17h 5m",
+          "stops": 1,
+          "departure_time": "7:25 AM",
+          "arrival_time": "9:30 PM"
+        },
+        "search_region": "oceania",
+        "source": "google_flights_price_graph",
+        "is_valid_deal": true,
+        "is_featured_candidate": true,
+        "score": 0.6228855721393034,
+        "expanded_at": "2025-11-17T12:41:12.525880",
+        "threshold_used": 0.1,
+        "discount_pct_display": "28%"
+      }
+    }
+  ],
+  "summary": {
+    "total_destinations_scanned": 1,
+    "valid_deals_found": 1,
+    "featured_deals_picked": 1,
+    "min_discount_pct": 0.2,
+    "min_similar_dates": 5
+  },
+  "total_featured_deals": 1,
+  "regions_on_sale": []
+}

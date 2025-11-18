@@ -1,0 +1,16 @@
+          {
+            "url": "https://www.google.com/log?format=json&hasfast=true",
+            "size": 131
+          }
+        ]
+      },
+      "similar_deals_count": 37
+    }
+  ],
+  "summary": {
+    "total_destinations": 61,
+    "deals_with_dates": 61,
+    "deals_expanded": 10,
+    "deals_with_flexibility": 5
+  }
+}
