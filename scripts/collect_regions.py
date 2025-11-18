@@ -20,17 +20,20 @@ from playwright.async_api import async_playwright, TimeoutError as PlaywrightTim
 
 # Standard regions available in Google Travel Explore
 DEFAULT_REGIONS = [
-    "Europe",
-    "Asia", 
-    "Africa",
+    "North America",
+    "Central America",
     "South America",
-    "Oceania",
     "Caribbean",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
     "Middle East",
 ]
 
 
 async def get_tfs_for_region(
+    page,  # Reuse existing page
     origin: str,
     region: str,
     verbose: bool = False,
@@ -46,6 +49,7 @@ async def get_tfs_for_region(
     4. Extract the new TFS from URL
     
     Args:
+        page: Playwright page object (reused across calls)
         origin: IATA airport code (e.g., "LAX", "JFK")
         region: Destination region (e.g., "Europe", "Asia")
         verbose: Print debug info
@@ -58,135 +62,108 @@ async def get_tfs_for_region(
     sys.path.insert(0, str(Path(__file__).parent.parent))
     from explore_scraper.tfs_builder import build_explore_url_for_origin
     
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,  # Run headless for speed
-            args=[
-                "--disable-blink-features=AutomationControlled",
-                "--disable-dev-shm-usage",
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-            ]
-        )
+    try:
+        # Start with origin already set in URL
+        start_url = build_explore_url_for_origin(origin)
+        if verbose:
+            print(f"[{origin}→{region}] Navigating with origin pre-set...", file=sys.stderr)
+            print(f"[{origin}→{region}] URL: {start_url}", file=sys.stderr)
         
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-            viewport={"width": 1920, "height": 1080},
-        )
-        page = await context.new_page()
-
+        if verbose:
+            print(f"[{origin}→{region}] Starting page.goto()...", file=sys.stderr)
+        await page.goto(start_url, wait_until="networkidle", timeout=timeout)
+        if verbose:
+            print(f"[{origin}→{region}] Page loaded, waiting 3s...", file=sys.stderr)
+        await page.wait_for_timeout(3000)  # Let page fully load
+        
+        if verbose:
+            print(f"[{origin}→{region}] Setting destination to: {region}", file=sys.stderr)
+        
+        # Find the destination input (origin is already set)
+        # Try clicking the "Where to?" field
+        dest_found = False
+        
+        # Method 1: Look for empty destination field
         try:
-            # Start with origin already set in URL
-            start_url = build_explore_url_for_origin(origin)
-            if verbose:
-                print(f"[{origin}→{region}] Navigating with origin pre-set...", file=sys.stderr)
+            # Wait for page to be ready
+            await page.wait_for_selector('input[type="text"]', timeout=5000)
             
-            await page.goto(start_url, wait_until="networkidle", timeout=timeout)
-            await page.wait_for_timeout(3000)  # Let page fully load
+            # Find all text inputs
+            inputs = await page.query_selector_all('input[type="text"]')
             
-            if verbose:
-                print(f"[{origin}→{region}] Setting destination to: {region}", file=sys.stderr)
-            
-            # Find the destination input (origin is already set)
-            # Try clicking the "Where to?" field
-            dest_found = False
-            
-            # Method 1: Look for empty destination field
-            try:
-                # Wait for page to be ready
-                await page.wait_for_selector('input[type="text"]', timeout=5000)
+            # Look for the one that's for destination (usually the second one, or has placeholder)
+            for inp in inputs:
+                placeholder = await inp.get_attribute('placeholder')
+                aria_label = await inp.get_attribute('aria-label')
+                value = await inp.get_attribute('value')
                 
-                # Find all text inputs
-                inputs = await page.query_selector_all('input[type="text"]')
-                
-                # Look for the one that's for destination (usually the second one, or has placeholder)
-                for inp in inputs:
-                    placeholder = await inp.get_attribute('placeholder')
-                    aria_label = await inp.get_attribute('aria-label')
-                    value = await inp.get_attribute('value')
-                    
-                    # Check if this looks like a destination field
-                    if placeholder and 'where to' in placeholder.lower():
-                        dest_input = inp
-                        dest_found = True
-                        break
-                    elif aria_label and 'where to' in aria_label.lower():
-                        dest_input = inp
-                        dest_found = True
-                        break
-                    elif aria_label and 'destination' in aria_label.lower():
-                        dest_input = inp
-                        dest_found = True
-                        break
-                
-                if not dest_found and len(inputs) >= 2:
-                    # Fallback: assume second input is destination
-                    dest_input = inputs[1]
+                # Check if this looks like a destination field
+                if placeholder and 'where to' in placeholder.lower():
+                    dest_input = inp
                     dest_found = True
-                    if verbose:
-                        print(f"[{origin}→{region}] Using second input field as destination", file=sys.stderr)
-                        
-            except Exception as e:
-                if verbose:
-                    print(f"[{origin}→{region}] Error finding destination field: {e}", file=sys.stderr)
+                    break
+                elif aria_label and 'where to' in aria_label.lower():
+                    dest_input = inp
+                    dest_found = True
+                    break
+                elif aria_label and 'destination' in aria_label.lower():
+                    dest_input = inp
+                    dest_found = True
+                    break
             
-            if not dest_found:
+            if not dest_found and len(inputs) >= 2:
+                # Fallback: assume second input is destination
+                dest_input = inputs[1]
+                dest_found = True
                 if verbose:
-                    print(f"[{origin}→{region}] ❌ Destination field not found", file=sys.stderr)
-                return None
-            
-            # Click and type region
-            await dest_input.click()
-            await page.wait_for_timeout(500)
-            await page.keyboard.type(region, delay=100)
-            await page.wait_for_timeout(2500)
-            
-            # Wait for autocomplete and click first option
-            try:
-                await page.wait_for_selector('[role="option"]', state="visible", timeout=4000)
-                options = await page.query_selector_all('[role="option"]')
-                if options and len(options) > 0:
-                    await options[0].click()
-                    if verbose:
-                        print(f"[{origin}→{region}] ✓ Clicked autocomplete option", file=sys.stderr)
-                    await page.wait_for_timeout(3000)  # Wait for URL to update
-                else:
-                    if verbose:
-                        print(f"[{origin}→{region}] ⚠️ No options found, pressing Enter", file=sys.stderr)
-                    await page.keyboard.press('Enter')
-                    await page.wait_for_timeout(3000)
-            except Exception as e:
-                if verbose:
-                    print(f"[{origin}→{region}] ⚠️ Autocomplete failed: {e}, pressing Enter", file=sys.stderr)
-                await page.keyboard.press('Enter')
-                await page.wait_for_timeout(3000)
-            
-            current_url = page.url
-            if verbose:
-                print(f"[{origin}→{region}] Current URL: {current_url[:100]}...", file=sys.stderr)
-            
-            # Extract TFS from URL
-            match = re.search(r'tfs=([^&]+)', current_url)
-            if match:
-                tfs = match.group(1)
-                if verbose:
-                    print(f"[{origin}→{region}] ✅ Extracted TFS: {tfs[:50]}...", file=sys.stderr)
-                return tfs
-            else:
-                if verbose:
-                    print(f"[{origin}→{region}] ❌ TFS parameter not found in URL", file=sys.stderr)
-                return None
-
-        except PlaywrightTimeoutError as e:
-            if verbose:
-                print(f"[{origin}→{region}] ❌ Timeout: {e}", file=sys.stderr)
-            return None
+                    print(f"[{origin}→{region}] Using second input field as destination", file=sys.stderr)
+                    
         except Exception as e:
             if verbose:
-                print(f"[{origin}→{region}] ❌ Error: {e}", file=sys.stderr)
+                print(f"[{origin}→{region}] Error finding destination field: {e}", file=sys.stderr)
+        
+        if not dest_found:
+            if verbose:
+                print(f"[{origin}→{region}] ❌ Destination field not found", file=sys.stderr)
             return None
-        finally:
-            await browser.close()
+        
+        # Click and type region
+        await dest_input.click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(region, delay=100)
+        await page.wait_for_timeout(2500)
+        
+        # Press Enter to use the typed region name (not autocomplete)
+        # This ensures "Africa" doesn't become "South Africa", etc.
+        if verbose:
+            print(f"[{origin}→{region}] Pressing Enter to confirm region", file=sys.stderr)
+        await page.keyboard.press('Enter')
+        await page.wait_for_timeout(3000)  # Wait for URL to update
+        
+        current_url = page.url
+        if verbose:
+            print(f"[{origin}→{region}] Current URL: {current_url[:100]}...", file=sys.stderr)
+        
+        # Extract TFS from URL
+        match = re.search(r'tfs=([^&]+)', current_url)
+        if match:
+            tfs = match.group(1)
+            if verbose:
+                print(f"[{origin}→{region}] ✅ Extracted TFS: {tfs[:50]}...", file=sys.stderr)
+            return tfs
+        else:
+            if verbose:
+                print(f"[{origin}→{region}] ❌ TFS parameter not found in URL", file=sys.stderr)
+            return None
+    
+    except PlaywrightTimeoutError as e:
+        if verbose:
+            print(f"[{origin}→{region}] ❌ Timeout: {e}", file=sys.stderr)
+        return None
+    except Exception as e:
+        if verbose:
+            print(f"[{origin}→{region}] ❌ Error: {e}", file=sys.stderr)
+        return None
 
 
 async def collect_regions_for_origin(
@@ -197,6 +174,7 @@ async def collect_regions_for_origin(
 ) -> Dict[str, Optional[str]]:
     """
     Collect TFS parameters for all regions from a given origin.
+    Launches a single browser and reuses it for all regions.
     
     Args:
         origin: IATA airport code
@@ -209,16 +187,31 @@ async def collect_regions_for_origin(
     """
     results = {}
     
-    for i, region in enumerate(regions, 1):
-        print(f"\n{'#'*60}")
-        print(f"Region {i}/{len(regions)}: {origin} → {region}")
-        print(f"{'#'*60}")
-        tfs = await get_tfs_for_region(origin, region, verbose=verbose)
-        results[region.lower().replace(" ", "_")] = tfs
+    # Launch a single browser for all regions
+    async with async_playwright() as p:
+        browser = await p.firefox.launch(
+            headless=False  # Run with visible browser to avoid detection
+        )
         
-        if i < len(regions) and tfs:
-            print(f"⏳ Waiting {delay}s before next region...")
-            await asyncio.sleep(delay)
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+        )
+        page = await context.new_page()
+        
+        try:
+            for i, region in enumerate(regions, 1):
+                print(f"\n{'#'*60}")
+                print(f"Region {i}/{len(regions)}: {origin} → {region}")
+                print(f"{'#'*60}")
+                tfs = await get_tfs_for_region(page, origin, region, verbose=verbose)
+                results[region.lower().replace(" ", "_")] = tfs
+                
+                if i < len(regions) and tfs:
+                    print(f"⏳ Waiting {delay}s before next region...")
+                    await asyncio.sleep(delay)
+        finally:
+            await browser.close()
     
     return results
 
@@ -284,12 +277,19 @@ def main():
         )
     )
     
-    # Build output structure
-    output = {
-        "origin": args.origin.upper(),
-        "regions": results,
-        "collected_at": None,  # Could add timestamp
-    }
+    # Load existing data if file exists, otherwise create new structure
+    if output_path.exists():
+        with open(output_path, "r") as f:
+            output = json.load(f)
+        # Merge new results with existing regions
+        output["regions"].update(results)
+    else:
+        # Build new output structure
+        output = {
+            "origin": args.origin.upper(),
+            "regions": results,
+            "collected_at": None,  # Could add timestamp
+        }
     
     # Add the default "anywhere" TFS using our protobuf builder
     sys.path.insert(0, str(Path(__file__).parent.parent))

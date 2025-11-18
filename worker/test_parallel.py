@@ -26,31 +26,50 @@ from explore_scraper.cli import run as explore_run
 PHASES = {
     1: {
         'name': 'Baseline (local test)',
-        'origins': ['PHX', 'DFW'],
+        'origins': ['PHX'],
         'browsers': 1,
-        'deals_per_origin': 5,
-        'description': 'Test locally to establish baseline performance'
+        'deals_per_origin': 2,
+        'regions': ['europe'],  # Just 1 region for speed
+        'description': 'Debug test: 1 origin, 1 region, 1 browser, 2 expansions (first verbose)'
     },
     2: {
         'name': 'Small parallel',
-        'origins': ['PHX', 'DFW', 'LAX', 'ORD', 'JFK'],
+        'origins': ['PHX', 'DFW'],
         'browsers': 2,
-        'deals_per_origin': 5,
-        'description': 'Verify 2 browsers work in parallel'
+        'deals_per_origin': 2,
+        'regions': ['europe'],  # Just 1 region for speed
+        'description': 'Test 2 browsers in parallel: 2 origins, 1 region, 2 expansions per browser'
     },
     3: {
-        'name': 'Medium scale',
-        'origins': ['PHX', 'DFW', 'LAX', 'ORD', 'JFK', 'ATL', 'DEN', 'SEA', 'MIA', 'BOS'],
-        'browsers': 4,
+        'name': 'Full workflow test',
+        'origins': ['PHX', 'DFW', 'LAX', 'ORD'],
+        'browsers': 10,  # More browsers, fewer expansions each
         'deals_per_origin': 5,
-        'description': 'Test with 4 browsers (~10GB RAM needed)'
+        'regions': ['central_america', 'south_america', 'caribbean', 'europe', 'africa', 'asia', 'oceania', 'middle_east'],  # All except North America
+        'description': 'Test 10 browsers: 4 origins, 8 regions (no North America), 2 expansions per browser'
+    },
+    4: {
+        'name': 'Production scale test',
+        'origins': ['DFW', 'ATL', 'PHX', 'ORD', 'OKC', 'BOS', 'DEN'],
+        'browsers': 7,
+        'deals_per_origin': 5,
+        'description': 'Test at 7% of production scale: 7 origins, 7 browsers, 35 expansions'
+    },
+    5: {
+        'name': 'Large scale test',
+        'origins': ['DFW', 'ATL', 'PHX', 'ORD', 'OKC', 'BOS', 'DEN', 'LAX', 'JFK', 'MIA', 
+                    'SEA', 'LAS', 'MCO', 'EWR', 'SFO', 'IAH', 'MSP', 'DTW', 'PHL', 'CLT',
+                    'SAN', 'TPA', 'PDX', 'STL'],
+        'browsers': 7,
+        'deals_per_origin': 5,
+        'description': 'Test at 24% of production scale: 24 origins, 7 browsers (staggered start), all 9 regions, 120 expansions'
     },
 }
 
 
 async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose: bool = False) -> List[dict]:
     """
-    Run Explore scraper for a single origin across all regions.
+    Run Explore scraper for a single origin across all regions IN PARALLEL.
     
     Args:
         origin: Airport code (e.g., 'PHX')
@@ -61,14 +80,11 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
         List of deal cards
     """
     if regions is None:
-        regions = ['europe', 'caribbean', 'south_america', 'oceania', 'africa']
+        regions = ['north_america', 'central_america', 'south_america', 'caribbean', 
+                   'europe', 'africa', 'asia', 'oceania', 'middle_east']
     
-    all_cards = []
-    
-    for region in regions:
-        if verbose:
-            print(f"  Exploring {origin} → {region}...")
-        
+    async def scrape_region(region: str):
+        """Scrape a single region."""
         try:
             result = await explore_run(
                 tfs_url=None,
@@ -82,7 +98,7 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
                 gl='us',
                 proxy=None,
                 max_bytes=100_000_000,
-                timeout=60.0,
+                timeout=120.0,
                 verbose=False
             )
             
@@ -95,30 +111,57 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
                     card['origin'] = origin
                     card['search_region'] = region
             
-            all_cards.extend(cards)
-            
-            if verbose:
-                print(f"    Found {len(cards)} cards")
+            return cards
         
         except Exception as e:
             if verbose:
-                print(f"    Error: {str(e)[:100]}")
-            continue
+                print(f"  ✗ {origin} → {region}: {str(e)[:50]}")
+            return []
+    
+    # Scrape all regions in parallel
+    region_tasks = [scrape_region(region) for region in regions]
+    region_results = await asyncio.gather(*region_tasks, return_exceptions=True)
+    
+    # Flatten results
+    all_cards = []
+    for i, result in enumerate(region_results):
+        if isinstance(result, Exception):
+            if verbose:
+                print(f"  ✗ {origin} → {regions[i]}: Exception - {result}")
+        else:
+            all_cards.extend(result)
+            if verbose:
+                print(f"  ✓ {origin} → {regions[i]}: {len(result)} cards")
     
     return all_cards
 
 
-def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int) -> List[dict]:
+def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region_filter: str = None) -> List[dict]:
     """
     Select top N deals per origin.
     
     Args:
         cards: List of deal cards from Explore
         deals_per_origin: Number of deals to select per origin
+        region_filter: Optional region to filter by (e.g., 'europe')
     
     Returns:
         Selected deals ready for expansion
     """
+    # City to IATA mapping for common destinations
+    CITY_TO_IATA = {
+        'Dublin': 'DUB', 'Barcelona': 'BCN', 'Madrid': 'MAD', 'Lisbon': 'LIS',
+        'Helsinki': 'HEL', 'Amsterdam': 'AMS', 'Zürich': 'ZRH', 'Stockholm': 'ARN',
+        'Paris': 'CDG', 'London': 'LHR', 'Rome': 'FCO', 'Athens': 'ATH',
+        'San Juan': 'SJU', 'Aruba': 'AUA', 'Cayman Islands': 'GCM', 'Anguilla': 'AXA',
+        'El Yunque National Forest': 'SJU',  # Use San Juan for El Yunque
+        'Tokyo': 'NRT', 'Sydney': 'SYD', 'Cancun': 'CUN'
+    }
+    
+    # Filter by region if specified
+    if region_filter:
+        cards = [c for c in cards if c.get('search_region') == region_filter]
+    
     # Group by origin
     by_origin = {}
     for card in cards:
@@ -127,18 +170,35 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int) -> Lis
             by_origin[origin] = []
         by_origin[origin].append(card)
     
-    # Select top N per origin
+    # Select top N per origin (with regional diversity)
     selected = []
     for origin, origin_cards in by_origin.items():
-        # Sort by price, take top N
-        sorted_cards = sorted(origin_cards, key=lambda x: x.get('min_price', 9999))
+        # Group by region first to ensure diversity
+        by_region = {}
+        for card in origin_cards:
+            region = card.get('search_region', 'unknown')
+            if region not in by_region:
+                by_region[region] = []
+            by_region[region].append(card)
+        
+        # Take cheapest deal from each region, then sort all by price
+        region_best = []
+        for region, region_cards in by_region.items():
+            cheapest = min(region_cards, key=lambda x: x.get('min_price', 9999))
+            region_best.append(cheapest)
+        
+        # Sort by price and take top N
+        sorted_cards = sorted(region_best, key=lambda x: x.get('min_price', 9999))
         top_cards = sorted_cards[:deals_per_origin]
         
         # Convert to expansion format
         for card in top_cards:
+            dest_name = card.get('destination')
+            dest_iata = CITY_TO_IATA.get(dest_name, dest_name)  # Fallback to name if not in map
+            
             selected.append({
                 'origin': origin,
-                'destination': card.get('destination'),
+                'destination': dest_iata,
                 'start_date': card.get('start_date'),
                 'end_date': card.get('end_date'),
                 'price': card.get('min_price'),
@@ -148,13 +208,14 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int) -> Lis
     return selected
 
 
-async def run_test_phase(phase: int, verbose: bool = True):
+async def run_test_phase(phase: int, verbose: bool = True, override_config: dict = None):
     """
     Run a specific test phase.
     
     Args:
         phase: Phase number (1-3)
         verbose: Print detailed progress
+        override_config: Optional config dict to override phase defaults
     
     Returns:
         Test results
@@ -163,7 +224,7 @@ async def run_test_phase(phase: int, verbose: bool = True):
         print(f"Invalid phase: {phase}. Must be 1-3.")
         return None
     
-    config = PHASES[phase]
+    config = override_config if override_config else PHASES[phase]
     
     print(f"\n{'='*80}")
     print(f"PHASE {phase}: {config['name']}")
@@ -177,17 +238,21 @@ async def run_test_phase(phase: int, verbose: bool = True):
     
     overall_start = datetime.now()
     
-    # STEP 1: Run Explore for all origins
-    print(f"STEP 1: Explore Scraping")
+    # STEP 1: Run Explore for all origins (SEQUENTIAL - simpler and more reliable)
+    print(f"STEP 1: Explore Scraping (Sequential)")
     print(f"-" * 80)
     explore_start = datetime.now()
     
     all_cards = []
+    regions_to_scrape = config.get('regions', None)  # Use config regions if specified
     for origin in config['origins']:
         print(f"\nExploring {origin}...")
-        cards = await run_explore_for_origin(origin, verbose=verbose)
-        all_cards.extend(cards)
-        print(f"  Total so far: {len(all_cards)} cards")
+        try:
+            cards = await run_explore_for_origin(origin, regions=regions_to_scrape, verbose=False)
+            all_cards.extend(cards)
+            print(f"  Total so far: {len(all_cards)} cards")
+        except Exception as e:
+            print(f"  ✗ Failed: {e}")
     
     explore_time = (datetime.now() - explore_start).total_seconds()
     print(f"\n✓ Explore complete: {len(all_cards)} cards in {explore_time:.1f}s ({explore_time/60:.1f} min)")
@@ -196,9 +261,13 @@ async def run_test_phase(phase: int, verbose: bool = True):
     print(f"\nSTEP 2: Deal Selection")
     print(f"-" * 80)
     
+    # For Phase 3+, scrape all regions; for Phase 1-2, focus on Europe only
+    region_filter = None if phase >= 3 else 'europe'
+    
     expansion_candidates = select_top_deals_per_origin(
         all_cards,
-        deals_per_origin=config['deals_per_origin']
+        deals_per_origin=config['deals_per_origin'],
+        region_filter=region_filter
     )
     
     print(f"Selected {len(expansion_candidates)} deals for expansion:")
@@ -281,8 +350,8 @@ Examples:
         '--phase',
         type=int,
         required=True,
-        choices=[1, 2, 3],
-        help='Test phase to run (1=baseline, 2=small parallel, 3=medium scale)'
+        choices=[1, 2, 3, 4, 5],
+        help='Test phase to run (1=baseline, 2=small parallel, 3=full workflow, 4=production scale)'
     )
     
     parser.add_argument(
@@ -291,10 +360,35 @@ Examples:
         help='Reduce verbosity'
     )
     
+    parser.add_argument(
+        '--origins',
+        type=int,
+        help='Override number of origins to test'
+    )
+    
+    parser.add_argument(
+        '--deals-per-origin',
+        type=int,
+        help='Override deals per origin to expand'
+    )
+    
     args = parser.parse_args()
     
-    # Run the test
-    result = asyncio.run(run_test_phase(args.phase, verbose=not args.quiet))
+    # Override phase config if specified
+    if args.origins or args.deals_per_origin:
+        base_config = PHASES[args.phase].copy()
+        if args.origins:
+            base_config['origins'] = base_config['origins'][:args.origins]
+        if args.deals_per_origin:
+            base_config['deals_per_origin'] = args.deals_per_origin
+        
+        result = asyncio.run(run_test_phase(
+            args.phase,
+            verbose=not args.quiet,
+            override_config=base_config
+        ))
+    else:
+        result = asyncio.run(run_test_phase(args.phase, verbose=not args.quiet))
     
     if result:
         print("\n✅ Test complete!")

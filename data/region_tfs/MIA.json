@@ -1,0 +1,17 @@
+{
+  "origin": "MIA",
+  "regions": {
+    "north_america": "GhNqBRIDTUlBcgoSCC9tLzA1OWc0GhNqChIIL20vMDU5ZzRyBRIDTUlBQgEBSAGYAQE",
+    "central_america": "GhNqBRIDTUlBcgoSCC9tLzAxdHpoGhNqChIIL20vMDF0emhyBRIDTUlBQgEBSAGYAQE",
+    "south_america": "GhNqBRIDTUlBcgoSCC9tLzA2bjN5GhNqChIIL20vMDZuM3lyBRIDTUlBQgEBSAGYAQE",
+    "caribbean": "GhNqBRIDTUlBcgoSCC9tLzAyNjFtGhNqChIIL20vMDI2MW1yBRIDTUlBQgEBSAGYAQE",
+    "europe": "GhNqBRIDTUlBcgoSCC9tLzAyajl6GhNqChIIL20vMDJqOXpyBRIDTUlBQgEBSAGYAQE",
+    "africa": "GhNqBRIDTUlBcgoSCC9tLzBoemx6GhNqChIIL20vMGh6bHpyBRIDTUlBQgEBSAGYAQE",
+    "asia": "GhJqBRIDTUlBcgkSBy9tLzBqMGsaEmoJEgcvbS8wajBrcgUSA01JQUIBAUgBmAEB",
+    "oceania": "GhNqBRIDTUlBcgoSCC9tLzAyd3p2GhNqChIIL20vMDJ3enZyBRIDTUlBQgEBSAGYAQE",
+    "middle_east": "GhNqBRIDTUlBcgoSCC9tLzA0d3N6GhNqChIIL20vMDR3c3pyBRIDTUlBQgEBSAGYAQE",
+    "anywhere": "GgdqBRIDTUlBGgdyBRIDTUlBQgEBSAGYAQE"
+  },
+  "collected_at": "2025-11-17T19:29:30.390676",
+  "method": "programmatic"
+}

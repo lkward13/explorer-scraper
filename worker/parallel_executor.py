@@ -117,6 +117,10 @@ class ParallelWorkerPool:
         # Import expand_dates here to avoid circular imports
         from scripts.expand_dates import expand_dates
         
+        # Stagger browser starts to avoid interference (each browser waits browser_id seconds)
+        if browser_id > 0:
+            await asyncio.sleep(browser_id * 2)  # 2 second stagger per browser
+        
         for idx, item in enumerate(chunk, 1):
             try:
                 if self.verbose:

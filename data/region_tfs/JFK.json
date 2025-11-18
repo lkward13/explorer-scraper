@@ -1,0 +1,17 @@
+{
+  "origin": "JFK",
+  "regions": {
+    "north_america": "GhNqBRIDSkZLcgoSCC9tLzA1OWc0GhNqChIIL20vMDU5ZzRyBRIDSkZLQgEBSAGYAQE",
+    "central_america": "GhNqBRIDSkZLcgoSCC9tLzAxdHpoGhNqChIIL20vMDF0emhyBRIDSkZLQgEBSAGYAQE",
+    "south_america": "GhNqBRIDSkZLcgoSCC9tLzA2bjN5GhNqChIIL20vMDZuM3lyBRIDSkZLQgEBSAGYAQE",
+    "caribbean": "GhNqBRIDSkZLcgoSCC9tLzAyNjFtGhNqChIIL20vMDI2MW1yBRIDSkZLQgEBSAGYAQE",
+    "europe": "GhNqBRIDSkZLcgoSCC9tLzAyajl6GhNqChIIL20vMDJqOXpyBRIDSkZLQgEBSAGYAQE",
+    "africa": "GhNqBRIDSkZLcgoSCC9tLzBoemx6GhNqChIIL20vMGh6bHpyBRIDSkZLQgEBSAGYAQE",
+    "asia": "GhJqBRIDSkZLcgkSBy9tLzBqMGsaEmoJEgcvbS8wajBrcgUSA0pGS0IBAUgBmAEB",
+    "oceania": "GhNqBRIDSkZLcgoSCC9tLzAyd3p2GhNqChIIL20vMDJ3enZyBRIDSkZLQgEBSAGYAQE",
+    "middle_east": "GhNqBRIDSkZLcgoSCC9tLzA0d3N6GhNqChIIL20vMDR3c3pyBRIDSkZLQgEBSAGYAQE",
+    "anywhere": "GgdqBRIDSkZLGgdyBRIDSkZLQgEBSAGYAQE"
+  },
+  "collected_at": "2025-11-17T19:29:30.389789",
+  "method": "programmatic"
+}

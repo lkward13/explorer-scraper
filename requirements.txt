@@ -1,5 +1,5 @@
-httpx[http2]>=0.27.0
-selectolax>=0.3.21
-playwright>=1.40.0
-protobuf>=6.0.0
-
+playwright==1.40.0
+protobuf==4.25.1
+psutil==5.9.6
+beautifulsoup4==4.12.2
+httpx==0.25.2

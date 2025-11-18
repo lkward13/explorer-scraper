@@ -6,8 +6,12 @@ __pycache__/
 .Python
 .venv/
 venv/
+cursor_venv/
 ENV/
 env/
+*.egg-info/
+dist/
+build/
 
 # IDE
 .vscode/
@@ -21,10 +25,20 @@ env/
 .coverage
 htmlcov/
 
-# Project specific
+# Project specific - logs and test output
+*.log
+phase*.log
 *.html
-*.json
+*.png
+debug_*
+test_*.json
+explore_results_*.json
+expansion_results_*.json
+
+# Keep these JSON files
 !requirements.txt
+!package.json
+!region_tfs/*.json
 
 # OS
 .DS_Store

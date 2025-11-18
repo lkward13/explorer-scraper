@@ -51,7 +51,13 @@ async def fetch_html_browser(
             launch_kwargs["proxy"] = {"server": proxy}
         
         # Launch browser
-        browser = await p.chromium.launch(**launch_kwargs)
+        # Use system Chrome on macOS (doesn't support headless), Playwright's Chromium elsewhere (Docker/Linux)
+        import platform
+        if platform.system() == "Darwin":  # macOS
+            launch_kwargs['headless'] = False
+            browser = await p.chromium.launch(channel='chrome', **launch_kwargs)
+        else:  # Linux/Docker
+            browser = await p.chromium.launch(**launch_kwargs)
         
         try:
             # Create context with realistic settings
@@ -68,7 +74,7 @@ async def fetch_html_browser(
             page.set_default_timeout(timeout * 1000)  # Convert to milliseconds
             
             # Navigate to URL
-            await page.goto(url, wait_until="networkidle")
+            await page.goto(url, wait_until="domcontentloaded")
             
             # Wait for destination cards to appear
             # We look for the card container class that we know from parsing
@@ -79,7 +85,9 @@ async def fetch_html_browser(
                 pass
             
             # Give it a moment for any final rendering
-            await page.wait_for_timeout(2000)
+            # macOS needs more time (10s), Linux is much faster (2s)
+            wait_time = 10000 if platform.system() == "Darwin" else 2000
+            await page.wait_for_timeout(wait_time)
             
             # Extract the fully-rendered HTML
             html = await page.content()

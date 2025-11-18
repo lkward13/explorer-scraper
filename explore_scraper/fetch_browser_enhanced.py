@@ -49,7 +49,13 @@ async def fetch_enhanced_cards(
         if proxy:
             launch_kwargs["proxy"] = {"server": proxy}
         
-        browser = await p.chromium.launch(**launch_kwargs)
+        # Use system Chrome on macOS, Playwright's Chromium elsewhere
+        import platform
+        if platform.system() == "Darwin":  # macOS
+            launch_kwargs['headless'] = False
+            browser = await p.chromium.launch(channel='chrome', **launch_kwargs)
+        else:  # Linux/Docker
+            browser = await p.chromium.launch(**launch_kwargs)
         
         try:
             context = await browser.new_context(

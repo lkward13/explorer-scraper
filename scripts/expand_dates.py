@@ -209,14 +209,22 @@ async def scrape_price_graph_data(
     dom_scraped_data = []  # Store DOM-scraped prices
     
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,  # Headless mode for stability
+        # Use system Chrome on macOS, Playwright's Chromium elsewhere
+        import platform
+        launch_kwargs = dict(
+            headless=True,
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--disable-dev-shm-usage",
                 "--no-sandbox",
             ]
         )
+        
+        if platform.system() == "Darwin":  # macOS
+            launch_kwargs['headless'] = False
+            browser = await p.chromium.launch(channel='chrome', **launch_kwargs)
+        else:  # Linux/Docker
+            browser = await p.chromium.launch(**launch_kwargs)
         
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
