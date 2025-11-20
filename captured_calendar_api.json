@@ -1,0 +1,27 @@
+[
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGrid?f.sid=-3556833754367434112&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=272427&rt=c",
+    "method": "POST",
+    "headers": {
+      "sec-ch-ua-full-version-list": "\"Chromium\";v=\"141.0.7390.37\", \"Not?A_Brand\";v=\"8.0.0.0\"",
+      "sec-ch-ua-platform": "\"macOS\"",
+      "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "x-same-domain": "1",
+      "sec-ch-ua-wow64": "?0",
+      "sec-ch-ua-form-factors": "\"Desktop\"",
+      "x-goog-batchexecute-bgr": "[\";qLa4tu7QAAZYJ-EEeCdfB7w6itaaN-smADQBEArZ1LByCs2eKT3p72t68C1QYJ4XS_8D_pK-KgsxpHgG7MPouQrSn-ID4tYiOqT2vBQeHwAAADtPAAAAAnUBB2MAQ9lWX9L6E2yJ3v5TmThYMtLicba74QecFzDyAcQbaODxFtBLIt79q0B5sNd0ZI640WBZuCTLAPC7cL8oGQljb7Ej1XWEAysB1lrn35_iCaWX8lZtSECpD54zVevqPC-6OXdmAq-juW_OD506f_g-lEBqpWMy5xKsiWsNdIBh8A3UvI-DwnS0OXRoGSk-Tc41oZzgylw8ONVa7AsQ4H24k--KjlkOMav9U8ZaefnZ8Jj795Wgm_q7NOjwJTfamBM0JXtI14uUeLU3EDNNNqrxErBn1eRegK0I7GIpbvoQ4990D6FSRNJIWrzAqTFbbtWZQyZw5uiUG28ojoiFBvvfUj2r7im-cbzljGK-jBMBSMIsjy_7BmMSExeTdw7y8BFtCy0k0_60fEFZW2n0ELI94XtnSEf08suqwY4r5qdKrpN8vpdXycYjjiCANK4MgraUhARqjMIodKLARGAZoHTKtOZrAeHK_9Zl2TUx9j1uCvlYEwJB3loQ0000by5acrI680YY76MIcnGv2rQ_R4xghiKu1Gnq0RelHsOR0W7XK18uG8OiWjWIuNj9XtTKukcMmtlZryL9Dof90WYZIgYN9vIbFuyraklGAyK0A1zUmpIhLXYwCkSmenlu9zl1qlXbqLDDqX61ogLpjPSIzyn17DhkVM-XdMyl2AVvg4PWBEMLIe6b-iZ9rbTz8kU0a_EZFSZr9tZicLhJYIyfMtzsDoNfLy3ncO1rRSjwBS7nocKY9voggTK65S_xgPTujglQydnqOZC2LKqScWekSxZdnzHcjTEWNCTTUUFqU6UBEpr2x-qU2Hhhb0RC7PdCRIvWgTF2TLemS-3MDQAbM54umm4t7Scg646pHR9ygjX80yUGFn6bBbK8cVgpzSpBZzZCXSJdiPn815biSl8brO8zfhzjaUhpRTf58Sqih8QLMUpBdHybebgbp_GcOm8fazlIF55PjVilbe2CmZmgHodXKjLQS5n64ahu7heH4QSQ3VvmaZbAWb7BDp0i349S3g8BIDE-2HeXf7y_JZzGnpc4g0vl-gXkjNRY2xqSkDjRlnyvOpqLPlkUPqiurk5_xzJ6nNgy-SR6HFAAjEUMoO-_x8jdQOhlq3NvhWPnSmHKa7p__WI4DCSUMxSp0Ze1wFARUvwlOLpny6iR3wtjiQYyk4xg\",null,null,3,null,null,null,0,\"5\"]",
+      "sec-ch-ua-arch": "\"arm\"",
+      "sec-ch-ua-full-version": "\"141.0.7390.37\"",
+      "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "referer": "https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMDEtMTFqBRIDQVRMcgUSA1NKVRoaEgoyMDI2LTAxLTIwagUSA1NKVXIFEgNBVExCAQFIAZgBAQ&hl=en&gl=us",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+      "x-goog-ext-259736195-jspb": "[\"en-US\",\"US\",\"USD\",2,null,[360],null,null,7,[]]",
+      "sec-ch-ua-platform-version": "\"15.6.1\""
+    },
+    "post_data": "f.req=%5Bnull%2C%22%5Bnull%2C%5Bnull%2Cnull%2C1%2Cnull%2C%5B%5D%2C1%2C%5B1%2C0%2C0%2C0%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5B%5B%5B%5B%5C%22ATL%5C%22%2C0%5D%5D%5D%2C%5B%5B%5B%5C%22SJU%5C%22%2C0%5D%5D%5D%2Cnull%2C0%2Cnull%2Cnull%2C%5C%222026-01-11%5C%22%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C3%5D%2C%5B%5B%5B%5B%5C%22SJU%5C%22%2C0%5D%5D%5D%2C%5B%5B%5B%5C%22ATL%5C%22%2C0%5D%5D%5D%2Cnull%2C0%2Cnull%2Cnull%2C%5C%222026-01-20%5C%22%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C3%5D%5D%2Cnull%2Cnull%2Cnull%2C1%5D%2C%5B%5C%222026-01-08%5C%22%2C%5C%222026-01-14%5C%22%5D%2C%5B%5C%222026-01-17%5C%22%2C%5C%222026-01-23%5C%22%5D%5D%22%5D&",
+    "resource_type": "xhr"
+  }
+]

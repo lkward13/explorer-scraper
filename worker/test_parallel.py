@@ -83,8 +83,8 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
         regions = ['north_america', 'central_america', 'south_america', 'caribbean', 
                    'europe', 'africa', 'asia', 'oceania', 'middle_east']
     
-    async def scrape_region(region: str):
-        """Scrape a single region."""
+    async def scrape_region(region: str, retry_count: int = 0, max_retries: int = 1):
+        """Scrape a single region with retry logic."""
         try:
             result = await explore_run(
                 tfs_url=None,
@@ -92,7 +92,7 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
                 origin_airport=origin,
                 region=region,
                 html_file=None,
-                use_browser=True,
+                use_browser=True,  # Browser required (HTTP consistently blocked)
                 enhanced_mode=False,
                 hl='en',
                 gl='us',
@@ -105,6 +105,13 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
             # Result is a list of cards
             cards = result if isinstance(result, list) else []
             
+            # If we got 0 cards and haven't retried yet, try once more (likely rate limited)
+            if len(cards) == 0 and retry_count < max_retries:
+                if verbose:
+                    print(f"  ⟳ {origin} → {region}: Got 0 cards, retrying ({retry_count + 1}/{max_retries})")
+                await asyncio.sleep(10)  # Wait 10 seconds to let rate limit reset
+                return await scrape_region(region, retry_count + 1, max_retries)
+            
             # Add origin and search_region to each card
             for card in cards:
                 if isinstance(card, dict):
@@ -114,24 +121,27 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
             return cards
         
         except Exception as e:
+            error_msg = str(e)
+            
+            # Retry on connection/network errors
+            if retry_count < max_retries and any(err in error_msg for err in ['ERR_SOCKET', 'net::ERR', 'timeout', 'Connection', 'closed']):
+                if verbose:
+                    print(f"  ⟳ {origin} → {region}: Retry {retry_count + 1}/{max_retries} ({error_msg[:30]})")
+                await asyncio.sleep(5)  # Wait 5 seconds before retry
+                return await scrape_region(region, retry_count + 1, max_retries)
+            
             if verbose:
-                print(f"  ✗ {origin} → {region}: {str(e)[:50]}")
+                print(f"  ✗ {origin} → {region}: {error_msg[:50]}")
             return []
     
-    # Scrape all regions in parallel
-    region_tasks = [scrape_region(region) for region in regions]
-    region_results = await asyncio.gather(*region_tasks, return_exceptions=True)
-    
-    # Flatten results
+    # Scrape regions SEQUENTIALLY to avoid too many browsers at once
+    # (Origins are still parallel, but regions within each origin are sequential)
     all_cards = []
-    for i, result in enumerate(region_results):
-        if isinstance(result, Exception):
-            if verbose:
-                print(f"  ✗ {origin} → {regions[i]}: Exception - {result}")
-        else:
-            all_cards.extend(result)
-            if verbose:
-                print(f"  ✓ {origin} → {regions[i]}: {len(result)} cards")
+    for region in regions:
+        cards = await scrape_region(region)
+        all_cards.extend(cards)
+        if verbose:
+            print(f"  ✓ {origin} → {region}: {len(cards)} cards")
     
     return all_cards
 
@@ -170,7 +180,7 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region
             by_origin[origin] = []
         by_origin[origin].append(card)
     
-    # Select top N per origin (with regional diversity)
+    # Select top N per origin (prioritize regional diversity, then price)
     selected = []
     for origin, origin_cards in by_origin.items():
         # Group by region first to ensure diversity
@@ -181,11 +191,23 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region
                 by_region[region] = []
             by_region[region].append(card)
         
-        # Take cheapest deal from each region, then sort all by price
+        # Take cheapest deal from each region
         region_best = []
         for region, region_cards in by_region.items():
             cheapest = min(region_cards, key=lambda x: x.get('min_price', 9999))
             region_best.append(cheapest)
+        
+        # If we have fewer regions than deals_per_origin, add more deals from cheapest regions
+        if len(region_best) < deals_per_origin:
+            # Sort all cards by price and add until we reach deals_per_origin
+            all_sorted = sorted(origin_cards, key=lambda x: x.get('min_price', 9999))
+            # Remove duplicates already in region_best
+            region_best_dests = {c.get('destination') for c in region_best}
+            for card in all_sorted:
+                if card.get('destination') not in region_best_dests:
+                    region_best.append(card)
+                    if len(region_best) >= deals_per_origin:
+                        break
         
         # Sort by price and take top N
         sorted_cards = sorted(region_best, key=lambda x: x.get('min_price', 9999))
@@ -208,7 +230,7 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region
     return selected
 
 
-async def run_test_phase(phase: int, verbose: bool = True, override_config: dict = None):
+async def run_test_phase(phase: int, verbose: bool = True, override_config: dict = None, use_api: bool = False):
     """
     Run a specific test phase.
     
@@ -238,21 +260,54 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     
     overall_start = datetime.now()
     
-    # STEP 1: Run Explore for all origins (SEQUENTIAL - simpler and more reliable)
-    print(f"STEP 1: Explore Scraping (Sequential)")
+    # STEP 1: Run Explore for all origins (BATCHED PARALLEL with staggered starts)
+    print(f"STEP 1: Explore Scraping (Batched Parallel)")
     print(f"-" * 80)
     explore_start = datetime.now()
     
-    all_cards = []
     regions_to_scrape = config.get('regions', None)  # Use config regions if specified
-    for origin in config['origins']:
-        print(f"\nExploring {origin}...")
-        try:
-            cards = await run_explore_for_origin(origin, regions=regions_to_scrape, verbose=False)
-            all_cards.extend(cards)
-            print(f"  Total so far: {len(all_cards)} cards")
-        except Exception as e:
-            print(f"  ✗ Failed: {e}")
+    
+    # Batch origins to avoid overwhelming the system (smaller batches = faster completion)
+    BATCH_SIZE = 5  # Process 5 origins at a time (with retry logic for failures)
+    origins = config['origins']
+    all_cards = []
+    
+    for batch_num in range(0, len(origins), BATCH_SIZE):
+        batch = origins[batch_num:batch_num + BATCH_SIZE]
+        batch_name = f"Batch {batch_num//BATCH_SIZE + 1}/{(len(origins) + BATCH_SIZE - 1)//BATCH_SIZE}"
+        
+        print(f"\n{batch_name}: Exploring {len(batch)} origins in parallel...")
+        
+        # Stagger browser starts to avoid connection issues
+        async def run_with_stagger(origin, delay):
+            if delay > 0:
+                await asyncio.sleep(delay)
+            return await run_explore_for_origin(origin, regions=regions_to_scrape, verbose=False)
+        
+        # Run batch in parallel with 3-second stagger between each origin
+        batch_tasks = [
+            run_with_stagger(origin, i * 3)
+            for i, origin in enumerate(batch)
+        ]
+        
+        batch_results = await asyncio.gather(*batch_tasks, return_exceptions=True)
+        
+        # Process results
+        for i, result in enumerate(batch_results):
+            origin = batch[i]
+            if isinstance(result, Exception):
+                print(f"  ✗ {origin}: Failed - {str(result)[:50]}")
+                # Retry failed origin once
+                try:
+                    print(f"     Retrying {origin}...")
+                    retry_result = await run_explore_for_origin(origin, regions=regions_to_scrape, verbose=False)
+                    all_cards.extend(retry_result)
+                    print(f"     ✓ {origin}: {len(retry_result)} cards (retry succeeded)")
+                except Exception as e:
+                    print(f"     ✗ {origin}: Retry failed - {str(e)[:50]}")
+            else:
+                all_cards.extend(result)
+                print(f"  ✓ {origin}: {len(result)} cards")
     
     explore_time = (datetime.now() - explore_start).total_seconds()
     print(f"\n✓ Explore complete: {len(all_cards)} cards in {explore_time:.1f}s ({explore_time/60:.1f} min)")
@@ -285,9 +340,13 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     
     expansion_start = datetime.now()
     
+    # Check if we should use API mode (parameter overrides config)
+    use_api_mode = use_api if use_api else config.get('use_api', False)
+    
     worker_pool = ParallelWorkerPool(
         num_browsers=config['browsers'],
-        verbose=verbose
+        verbose=verbose,
+        use_api=use_api_mode
     )
     
     results = await worker_pool.process_expansions(expansion_candidates)
@@ -330,7 +389,8 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
         'cards_found': len(all_cards),
         'expansions_attempted': len(expansion_candidates),
         'expansions_succeeded': len(results),
-        'valid_deals': len(valid_deals)
+        'valid_deals': len(valid_deals),
+        'expanded_deals': results  # Add full results for detailed analysis
     }
 
 

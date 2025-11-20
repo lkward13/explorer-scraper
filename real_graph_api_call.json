@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetCalendarGraph?f.sid=2693299003099396364&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=275039&rt=c",
+    "method": "POST",
+    "headers": {
+      "sec-ch-ua-full-version-list": "\"Chromium\";v=\"141.0.7390.37\", \"Not?A_Brand\";v=\"8.0.0.0\"",
+      "sec-ch-ua-platform": "\"macOS\"",
+      "sec-ch-ua": "\"Chromium\";v=\"141\", \"Not?A_Brand\";v=\"8\"",
+      "sec-ch-ua-bitness": "\"64\"",
+      "sec-ch-ua-model": "\"\"",
+      "sec-ch-ua-mobile": "?0",
+      "x-same-domain": "1",
+      "sec-ch-ua-wow64": "?0",
+      "sec-ch-ua-form-factors": "\"Desktop\"",
+      "x-goog-batchexecute-bgr": "[\";Y324fSXQAAZYJ-EEeCdfpmfBuvjXHNEmADQBEArZ1HRAJwhl0nbUt2MqiQKtUX5_Nxp-fThfVtTYX5lHYFHjz1uCDbJRijq4e33ZVJONHwAAAE5PAAAAAnUBB2MAQ5eQ7WLmCMLBbvStZYkFKrPEFIsnI6CyEa1cXmL3I7CdEfiprumJH7zA4rYmyMk04xgUjzyK4vGIitEjwLl3sVHQhk2EAzmBQ3b5XzkDmWnAUQEtHj_roBZsXAc97OUrUCF8epWjncSWvAT-djmbzbRJ-mbNTb4zsCWD3JXhHFZl0tDNLm1aOxrS2h4tIz_wXJBKdvFOdh1SQXPJPImqbKSYFvzEK88NwZ2KD5OMLGQ6fWV_Wasjd2ZXbn1sLq2qChlYqL8I8_RqomxSznvle4vl9174C4HKVMA78-XXIigvwcIO5rnJup1dmEGR6n8sMuxgpvha-kCseg209tQjMN27rjk5uhqKZ0HfndV5GVOSBkEWamCr4IlBFNY5z58vxjs2-qVOWEE9RhQ3rJNL9wbrQChyFqyML6xfI6sIY7H9FxGcKAEOgc-ZGazZLfy8tKZ6ogBjAXBrPLY8uwFfEPFnvCNpkELr9mLOt3mfzYGmQXoju3_kPK2TrwDKsU9wHHYyEh60R4ajx1z4XYhUXgBFrEKzEVqlK_S6dbZCimMDAbDcArXUfpIdsAhLZ79SC0--uS0iBoG-PdNvJnQrShM4DuOoHtVstMmxi1b1w5b3dAvjAU2LzqalYux-v6hth6xvn6_3p-OTjttM39vnvwghsNADdiTdJ6CTs5I-V2m0AHe8useTnbZKpI_AdwQngYFGi8_uv4Yk-zh1-zna70LtkRJn8ejetTHaiLS-ESREEpj1u2DZGoy1MFDmt4Qnq7DjGshAkmNd3wf49EtIMuteM22kDpxG4MXxRJfZMFugfS-7VQjJVfM1jHVufmx1_na6cXCNuAxnKoXNaJLfYDYJIqY7yIAYYDDL3F1LyLF9IYMrvbkuTTneYhr9qhDN68oemyGhPaOAuoVt8PCPpfCp51nySqJBGUWXls4p_Ij7rcNPiZ_ZYd4eL4Md3of13TJtPqSTMxqxpjtTZKRs7uf1dOCKRMOz68a45U0JifpzbYTbzYfvYX8qBQKEhny1VULMJb6sTCPC-sryeHBxxejp6EiIbiukfnHqFSFMvKyiZYx6DUYCUTrmSOrPvgI1MuJ1kNCqZcrgVBuPM3FpO-Qddw0O7EWY6hPkfu_kB85J7RwfS6I3zHhSmpcb8cW06Pt1p1Yxn9QvAs8Ze3cbDWY1H58CUsfVzsU_U56e9Mc\",null,null,8,null,null,null,0,\"5\"]",
+      "sec-ch-ua-arch": "\"arm\"",
+      "sec-ch-ua-full-version": "\"141.0.7390.37\"",
+      "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "referer": "https://www.google.com/travel/flights?q=flights+from+ATL+to+SJU+on+2026-01-11+return+2026-01-20&hl=en&gl=us",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+      "x-goog-ext-259736195-jspb": "[\"en-US\",\"US\",\"USD\",2,null,[360],null,null,7,[]]",
+      "sec-ch-ua-platform-version": "\"15.6.1\""
+    },
+    "post_data": "f.req=%5Bnull%2C%22%5Bnull%2C%5Bnull%2Cnull%2C1%2Cnull%2C%5B%5D%2C1%2C%5B1%2C0%2C0%2C0%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5B%5B%5B%5B%5C%22ATL%5C%22%2C0%5D%5D%5D%2C%5B%5B%5B%5C%22SJU%5C%22%2C0%5D%5D%5D%2Cnull%2C0%2Cnull%2Cnull%2C%5C%222026-01-11%5C%22%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C3%5D%2C%5B%5B%5B%5B%5C%22SJU%5C%22%2C0%5D%5D%5D%2C%5B%5B%5B%5C%22ATL%5C%22%2C0%5D%5D%5D%2Cnull%2C0%2Cnull%2Cnull%2C%5C%222026-01-20%5C%22%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C3%5D%5D%2Cnull%2Cnull%2Cnull%2C1%5D%2C%5B%5C%222026-01-04%5C%22%2C%5C%222026-03-04%5C%22%5D%2Cnull%2C%5B9%2C9%5D%5D%22%5D&"
+  }
+]

@@ -1,0 +1,51 @@
+================================================================================
+FAILING ROUTES TO TEST MANUALLY (Getting 0 similar dates in scraper)
+================================================================================
+
+1. ATL → Miami ($58)
+   Dates: 2026-01-11 to 2026-01-20
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDQVRMcgYSBE1JQU1JGiYSCjIwMjYtMDEtMjBqBhIETUlBTUlyBRIDQVRMQgEBSAGYAQE&hl=en&gl=us
+   
+   Test: Open URL, click "Date grid" or "Price graph", check if calendar shows prices
+
+2. LAX → Las Vegas ($50)
+   Dates: 2026-01-11 to 2026-01-20
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDTEFYcgsSDExBUyBWRUdBUxomEgoyMDI2LTAxLTIwcgsSDExBUyBWRUdBU3IFEgNMQVhCAQFIAZgBAQ&hl=en&gl=us
+
+3. ATL → Antigua Guatemala ($195)
+   Dates: 2026-02-21 to 2026-02-28
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDItMjFqBRIDQVRMchMSEUFOVElHVUEgR1VBVEVNQUxBGigSCjIwMjYtMDItMjhqExIRQU5USUdVQSBHVUFURU1BTEFyBRIDQVRMQgEBSAGYAQE&hl=en&gl=us
+
+4. LAX → Copan Ruinas ($228)
+   Dates: Approx 2026-01-11 to 2026-01-20
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDTEFYcg0SC0NPUEFOIFJVSU5BUxooEgoyMDI2LTAxLTIwcg0SC0NPUEFOIFJVSU5BU3IFEgNMQVhCAQFIAZgBAQ&hl=en&gl=us
+
+5. LAX → Aruba (AUA) ($306)
+   Dates: 2026-01-11 to 2026-01-20
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDTEFYcgYSBEFSVUJBGiYSCjIwMjYtMDEtMjBqBhIEQVJVQkFyBRIDTEFYQgEBSAGYAQE&hl=en&gl=us
+
+================================================================================
+SUCCESSFUL ROUTES (for comparison - these DO return calendar data)
+================================================================================
+
+1. ATL → San Juan (SJU) ($171) - Found 22 similar dates
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDQVRMcgYSBFNBTiBKVUFOGiYSCjIwMjYtMDEtMjBqBhIEU0FOIEpVQU5yBRIDQVRMQgEBSAGYAQE&hl=en&gl=us
+
+2. LAX → San Juan (SJU) ($252) - Found 20 similar dates
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDTEFYcgYSBFNBTiBKVUFOGiYSCjIwMjYtMDEtMjBqBhIEU0FOIEpVQU5yBRIDTEFYQgEBSAGYAQE&hl=en&gl=us
+
+3. ATL → Stockholm (ARN) ($441) - Found 92 similar dates
+   URL: https://www.google.com/travel/flights?tfs=GigSCjIwMjYtMDEtMTFqBRIDQVRMcgsSCVNUT0NLSE9MTRomEgoyMDI2LTAxLTIwcgsSCVNUT0NLSE9MTXIFEgNBVExCAQFIAZgBAQ&hl=en&gl=us
+
+================================================================================
+WHAT TO CHECK:
+================================================================================
+1. Does the "Date grid" or "Price graph" button exist?
+2. When you click it, does a calendar/graph appear?
+3. Does the calendar show prices for different dates?
+4. Are there any error messages or empty states?
+
+If the calendar DOES show prices for you manually, but our scraper gets 0 dates,
+then it's a bot detection issue. If the calendar is also empty for you, then
+Google doesn't provide that data for those routes.
+

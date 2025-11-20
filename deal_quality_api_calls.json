@@ -1,0 +1,80 @@
+[
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/batchexecute?rpcids=tDoGIe&source-path=%2Ftravel%2Fexplore&f.sid=7645739535225070497&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=276381&rt=c",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "f.req=%5B%5B%5B%22tDoGIe%22%2C%22%5Bnull%2C%5B%5B%5C%22%2Fm%2F04llb%5C%22%2C4%5D%5D%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&"
+  },
+  {
+    "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+    "method": "POST",
+    "resource_type": "fetch",
+    "post_data": "<binary or gzipped data>"
+  },
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/batchexecute?rpcids=JnCqBe&source-path=%2Ftravel%2Fexplore&f.sid=7645739535225070497&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=676381&rt=c",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "f.req=%5B%5B%5B%22JnCqBe%22%2C%22%5Bnull%2C%5C%22%2Fm%2F04llb%5C%22%2C11%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&"
+  },
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/batchexecute?rpcids=ejtx4d&source-path=%2Ftravel%2Fexplore&f.sid=7645739535225070497&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=776381&rt=c",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "f.req=%5B%5B%5B%22ejtx4d%22%2C%22%5B%5C%22%2Fm%2F04llb%5C%22%2C35%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&"
+  },
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetExploreDestinations?f.sid=7645739535225070497&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=376381&rt=c",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "f.req=%5Bnull%2C%22%5B%5B%5D%2Cnull%2Cnull%2C%5Bnull%2Cnull%2C1%2Cnull%2C%5B%5D%2C1%2C%5B1%2C0%2C0%2C0%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5B%5B%5B%5B%5C%22DFW%5C%22%2C0%5D%5D%5D%2C%5B%5B%5B%5C%22%2Fm%2F02j9z%5C%22%2C6%5D%5D%5D%2Cnull%2C0%5D%2C%5B%5B%5B%5B%5C%22%2Fm%2F02j9z%5C%22%2C6%5D%5D%5D%2C%5B%5B%5B%5C%22DFW%5C%22%2C0%5D%5D%5D%2Cnull%2C0%5D%5D%2Cnull%2Cnull%2Cnull%2C0%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5C%22%2Fm%2F04llb%5C%22%2C4%5D%5D%2Cnull%2C1%2Cnull%2C0%2Cnull%2C1%2C%5B844%2C640%5D%2C4%5D%22%5D&"
+  },
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/travel.frontend.flights.FlightsFrontendService/GetExploreDestinationFlightDetails?f.sid=7645739535225070497&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=476381&rt=c",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "f.req=%5Bnull%2C%22%5B%5Bnull%2C%5C%22CjRIRjdyN3RvTGNUZTBBQmFEeFFCRy0tLS0tLS0tLS1va2t2MkFBQUFBR2tlaDBBTGRGZXdBEh1ERlctTElTOjIwMjUtMTItMDFfMjAyNS0xMi0wORoLCMXwAhACGgNVU0Q4KXDF8AI%3D%5C%22%5D%2C%5Bnull%2Cnull%2C1%2Cnull%2Cnull%2C1%2C%5B1%2C0%2C0%2C0%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5B%5B%5B%5B%5C%22DFW%5C%22%2C0%5D%5D%5D%2C%5B%5B%5B%5C%22%2Fm%2F04llb%5C%22%2C4%5D%5D%5D%2Cnull%2C0%2Cnull%2Cnull%2C%5C%222025-12-01%5C%22%5D%2C%5B%5B%5B%5B%5C%22%2Fm%2F04llb%5C%22%2C4%5D%5D%5D%2C%5B%5B%5B%5C%22DFW%5C%22%2C0%5D%5D%5D%2Cnull%2C0%2Cnull%2Cnull%2C%5C%222025-12-09%5C%22%5D%5D%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C%5B%5C%22%2Fm%2F04llb%5C%22%2C4%5D%5D%5D%22%5D&"
+  },
+  {
+    "url": "https://www.google.com/_/FlightsFrontendUi/data/batchexecute?rpcids=NhbMce&source-path=%2Ftravel%2Fexplore&f.sid=7645739535225070497&bl=boq_travel-frontend-flights-ui_20251118.02_p0&hl=en&gl=us&soc-app=162&soc-platform=1&soc-device=1&_reqid=576381&rt=c",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "f.req=%5B%5B%5B%22NhbMce%22%2C%22%5Bnull%2C%5C%22%2Fm%2F04llb%5C%22%2C%5B2025%2C12%2C2%5D%2C%5B2025%2C12%2C9%5D%2Cnull%2C%5C%22Lisbon%5C%22%2C%5B1%2C0%2C0%2C0%5D%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&"
+  },
+  {
+    "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+    "method": "POST",
+    "resource_type": "fetch",
+    "post_data": "<binary or gzipped data>"
+  },
+  {
+    "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+    "method": "POST",
+    "resource_type": "fetch",
+    "post_data": "<binary or gzipped data>"
+  },
+  {
+    "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+    "method": "POST",
+    "resource_type": "fetch",
+    "post_data": "<binary or gzipped data>"
+  },
+  {
+    "url": "https://maps.googleapis.com/maps_api_js_slo/log?hasfast=true",
+    "method": "POST",
+    "resource_type": "xhr",
+    "post_data": "[[1],1627,[[\"1763608388853\",null,null,null,null,null,null,\"[0,0,null,\\\"3.63.1b\\\",\\\"AIzaSyCT630gB9vsy-OypIlcTPFlkeCMXkxyj2k\\\",\\\"\\\",\\\"www.google.com\\\",\\\"EF65B1D8-B0C6-41C1-BACF-A0EB44920EC0\\\",null,0]\",null,null,null,null,null,null,21600,null,null,null,null,null,64,null,null,\"[[[1763608381274934,0,0],64],null,null,[149886,null,1,null,null,null,null,null,null,null,null,null,null,null,[{\\\"126\\\":[[\\\"1763608388852\\\"]],\\\"189\\\":[null,null,null,\\\"0659AB00-3049-49BB-8FCE-633F1AB1F1BA\\\"]}]],null,null,null,null,[]]\"],[\"1763608388894\",null,null,null,null,null,null,\"[0,0,null,\\\"3.63.1b\\\",\\\"AIzaSyCT630gB9vsy-OypIlcTPFlkeCMXkxyj2k\\\",\\\"\\\",\\\"www.google.com\\\",\\\"EF65B1D8-B0C6-41C1-BACF-A0EB44920EC0\\\",null,0]\",null,null,null,null,null,null,21600,null,null,null,null,null,65,null,null,\"[[[1763608381274934,0,0],65],null,null,[233144,null,1,null,null,null,null,null,null,null,null,null,null,null,[{\\\"126\\\":[[\\\"1763608388894\\\"]]}]],null,null,null,null,[]]\"],[\"1763608388896\",null,null,null,null,null,null,\"[0,0,null,\\\"3.63.1b\\\",\\\"AIzaSyCT630gB9vsy-OypIlcTPFlkeCMXkxyj2k\\\",\\\"\\\",\\\"www.google.com\\\",\\\"EF65B1D8-B0C6-41C1-BACF-A0EB44920EC0\\\",null,0]\",null,null,null,null,null,null,21600,null,null,null,null,null,66,null,null,\"[[[1763608381274934,0,0],66],null,null,[147754,null,1,null,null,null,null,null,null,null,null,null,null,null,[{\\\"126\\\":[[\\\"1763608388896\\\"]],\\\"189\\\":[null,null,null,\\\"0659AB00-3049-49BB-8FCE-633F1AB1F1BA\\\"]}]],null,null,null,null,[]]\"],[\"1763608388896\",null,null,null,null,null,null,\"[0,0,null,\\\"3.63.1b\\\",\\\"AIzaSyCT630gB9vsy-OypIlcTPFlkeCMXkxyj2k\\\",\\\"\\\",\\\"www.google.com\\\",\\\"EF65B1D8-B0C6-41C1-BACF-A0EB44920EC0\\\",null,0]\",null,null,null,null,null,null,21600,null,null,null,null,null,67,null,null,\"[[[1763608381274934,0,0],67],null,null,[233143,null,1,null,null,null,null,null,null,null,null,null,null,null,[{\\\"120\\\":[[null,null,[null,46399999],null,null,[0]]],\\\"126\\\":[[\\\"1763608388896\\\"]]}]],null,null,null,null,[]]\"],[\"1763608388897\",null,null,null,null,null,null,\"[0,0,null,\\\"3.63.1b\\\",\\\"AIzaSyCT630gB9vsy-OypIlcTPFlkeCMXkxyj2k\\\",\\\"\\\",\\\"www.google.com\\\",\\\"EF65B1D8-B0C6-41C1-BACF-A0EB44920EC0\\\",null,0]\",null,null,null,null,null,null,21600,null,null,null,null,null,68,null,null,\"[[[1763608381274934,0,0],68],null,null,[147753,null,1,null,null,null,null,null,null,null,null,null,null,null,[{\\\"126\\\":[[\\\"1763608388897\\\"]],\\\"189\\\":[null,null,null,\\\"0659AB00-3049-49BB-8FCE-633F1AB1F1BA\\\"]}]],null,null,null,null,[]]\"]],\"1763608389354\"]"
+  },
+  {
+    "url": "https://www.google.com/log?format=json&hasfast=true&authuser=0",
+    "method": "POST",
+    "resource_type": "fetch",
+    "post_data": "[[1,null,null,null,null,null,null,null,null,null,[null,null,null,null,\"en\",null,\"boq_travel-frontend-flights-ui_20251118.02_p0\",null,[[[\"Chromium\",\"141\"],[\"Not?A_Brand\",\"8\"]],0,\"macOS\",\"15.6.1\",\"arm\",\"\",\"141.0.7390.37\"],[4,0]]],704,[[\"1763608389506\",null,null,null,null,null,null,\"[null,[null,\\\"12ahUKEwi5pJaY4f-QAxU4XX8AHW-dIDsQwNwFegQIAxAs..i\\\"]]\",null,null,5,null,null,null,21600,null,null,null,null,null,20,null,null,\"[[[1763608380736000,0,0],119],[[93119,null,null,[1,2,3]],[120950],[120951],[122253,null,null,[4,5,6,7]],[94443,null,0],[94443,null,1],[94443,null,2],[94444]],[[1763608380150329,8346936,991993199]],[]]\"]],\"1763608389506\",null,null,null,null,null,null,null,null,null,null,null,null,null,[[null,[null,null,null,null,null,null,null,null,null,null,null,null,77919732]],9]]"
+  },
+  {
+    "url": "https://www.google.com/log?format=json&hasfast=true",
+    "method": "POST",
+    "resource_type": "fetch",
+    "post_data": "<binary or gzipped data>"
+  }
+]

@@ -21,7 +21,8 @@ class ParallelWorkerPool:
         self, 
         num_browsers: int = 2,
         proxy_list: Optional[List[dict]] = None,
-        verbose: bool = True
+        verbose: bool = True,
+        use_api: bool = False
     ):
         """
         Initialize worker pool.
@@ -30,10 +31,12 @@ class ParallelWorkerPool:
             num_browsers: Number of concurrent browser instances
             proxy_list: Optional list of proxy configs for each browser
             verbose: Print progress information
+            use_api: Use direct API calls instead of browser automation (faster, more reliable)
         """
         self.num_browsers = num_browsers
         self.proxy_list = proxy_list or []
         self.verbose = verbose
+        self.use_api = use_api
         self.stats = {
             'expansions_completed': 0,
             'expansions_failed': 0,
@@ -69,13 +72,13 @@ class ParallelWorkerPool:
             for i in range(0, len(expansion_queue), chunk_size)
         ]
         
-        if self.verbose:
-            print(f"\n{'='*80}")
-            print(f"PARALLEL EXECUTION: {len(expansion_queue)} expansions across {self.num_browsers} browser(s)")
-            print(f"{'='*80}")
-            for i, chunk in enumerate(chunks):
-                print(f"  Browser {i+1}: {len(chunk)} expansions")
-            print()
+        # Always print execution header (for progress visibility)
+        print(f"\n{'='*80}")
+        print(f"PARALLEL EXECUTION: {len(expansion_queue)} expansions across {self.num_browsers} browser(s)")
+        print(f"{'='*80}")
+        for i, chunk in enumerate(chunks):
+            print(f"  Browser {i+1}: {len(chunk)} expansions")
+        print()
         
         # Process each chunk in parallel
         tasks = [
@@ -114,8 +117,11 @@ class ParallelWorkerPool:
         results = []
         browser_start = datetime.now()
         
-        # Import expand_dates here to avoid circular imports
-        from scripts.expand_dates import expand_dates
+        # Import expansion method based on mode
+        if self.use_api:
+            from scripts.expand_dates_api import expand_deal_via_api
+        else:
+            from scripts.expand_dates import expand_dates
         
         # Stagger browser starts to avoid interference (each browser waits browser_id seconds)
         if browser_id > 0:
@@ -125,20 +131,37 @@ class ParallelWorkerPool:
             try:
                 if self.verbose:
                     elapsed = (datetime.now() - self.stats['start_time']).total_seconds()
-                    print(f"[Browser {browser_id+1}] [{elapsed:.0f}s] {idx}/{len(chunk)}: "
+                    mode_label = "API" if self.use_api else "Browser"
+                    print(f"[{mode_label} {browser_id+1}] [{elapsed:.0f}s] {idx}/{len(chunk)}: "
                           f"{item['origin']} → {item['destination']} (${item['price']})")
                 
                 expansion_start = datetime.now()
                 
-                # Run expansion
-                result = await expand_dates(
-                    origin=item['origin'],
-                    destination=item['destination'],
-                    reference_start=item['start_date'],
-                    reference_end=item['end_date'],
-                    reference_price=item['price'],
-                    verbose=False
-                )
+                # Run expansion using selected method
+                if self.use_api:
+                    # API method - returns list of deals directly
+                    similar_deals = await expand_deal_via_api(
+                        origin=item['origin'],
+                        destination=item['destination'],
+                        outbound_date=item['start_date'],
+                        return_date=item['end_date'],
+                        original_price=item['price'],
+                        verbose=True  # Enable verbose to see API details
+                    )
+                    result = {
+                        'similar_deals': similar_deals,
+                        'method': 'api'
+                    }
+                else:
+                    # Browser method - returns dict with similar_deals
+                    result = await expand_dates(
+                        origin=item['origin'],
+                        destination=item['destination'],
+                        reference_start=item['start_date'],
+                        reference_end=item['end_date'],
+                        reference_price=item['price'],
+                        verbose=False
+                    )
                 
                 expansion_time = (datetime.now() - expansion_start).total_seconds()
                 
@@ -154,6 +177,10 @@ class ParallelWorkerPool:
                 
                 self.stats['expansions_completed'] += 1
                 self.stats['browser_times'].append(expansion_time)
+                
+                # Add small delay between expansions to avoid rate limiting
+                if idx < len(chunk):  # Don't delay after last item
+                    await asyncio.sleep(3)  # 3 second delay between expansions
                 
             except Exception as e:
                 if self.verbose:

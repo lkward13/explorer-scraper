@@ -19,6 +19,16 @@ from typing import Optional, List, Dict, Any
 from pathlib import Path
 from playwright.async_api import async_playwright
 
+# Import stealth configuration
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from browser_stealth import (
+    get_stealth_context_options,
+    get_stealth_launch_args,
+    apply_stealth_to_page,
+    add_human_behavior,
+    get_random_delay
+)
+
 
 def build_flights_url(
     origin: str,
@@ -209,28 +219,45 @@ async def scrape_price_graph_data(
     dom_scraped_data = []  # Store DOM-scraped prices
     
     async with async_playwright() as p:
-        # Use system Chrome on macOS, Playwright's Chromium elsewhere
+        # Run in headed mode (non-headless) with comprehensive stealth
+        # In Docker, this uses Xvfb virtual display
         import platform
+        import os
+        
+        # Get stealth launch args
         launch_kwargs = dict(
-            headless=True,
-            args=[
-                "--disable-blink-features=AutomationControlled",
-                "--disable-dev-shm-usage",
-                "--no-sandbox",
-            ]
+            headless=False,  # Uses Xvfb in Docker
+            args=get_stealth_launch_args()
         )
         
         if platform.system() == "Darwin":  # macOS
-            launch_kwargs['headless'] = False
             browser = await p.chromium.launch(channel='chrome', **launch_kwargs)
         else:  # Linux/Docker
             browser = await p.chromium.launch(**launch_kwargs)
         
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-            viewport={"width": 1920, "height": 1080},
-        )
+        # Get randomized stealth context options
+        context_options = get_stealth_context_options()
+        
+        # Add Packetstream residential proxy if credentials are available
+        proxy_host = os.getenv('PROXY_HOST', 'proxy.packetstream.io')
+        proxy_port = os.getenv('PROXY_PORT', '31112')
+        proxy_user = os.getenv('PROXY_USER')
+        proxy_pass = os.getenv('PROXY_PASS')
+        
+        if proxy_user and proxy_pass:
+            context_options['proxy'] = {
+                'server': f'http://{proxy_host}:{proxy_port}',
+                'username': proxy_user,
+                'password': proxy_pass
+            }
+            if verbose:
+                print(f"[info] Using residential proxy: {proxy_host}:{proxy_port}", file=sys.stderr)
+        
+        context = await browser.new_context(**context_options)
+        
+        # Create page and apply stealth JavaScript
         page = await context.new_page()
+        await apply_stealth_to_page(page)
         
         # Set up network interception - capture ALL responses, especially after clicks
         async def handle_response(response):
@@ -270,7 +297,16 @@ async def scrape_price_graph_data(
         try:
             # Navigate to flights page (dates already in URL via protobuf)
             await page.goto(url, wait_until="networkidle", timeout=timeout)
-            await page.wait_for_timeout(5000)  # Let page fully load with results
+            
+            # Random initial wait
+            short_delay, long_delay = get_random_delay()
+            await page.wait_for_timeout(int(short_delay * 1000))
+            
+            # Add human-like behavior (scrolling, mouse movement)
+            await add_human_behavior(page, verbose=verbose)
+            
+            # Wait for page to fully load
+            await page.wait_for_timeout(int(long_delay * 1000))
             
             # Extract airport code from URL (in case city mapping is wrong)
             url_match = re.search(r'/flights/[A-Z]{3}-([A-Z]{3})', page.url)
@@ -424,7 +460,7 @@ async def scrape_price_graph_data(
                     print(f"[info] Paginating through price graph data...", file=sys.stderr)
                     print(f"[info] Waiting for price graph to fully load...", file=sys.stderr)
                 
-                # Wait longer for price graph to fully render
+                # Wait for price graph to fully render
                 await page.wait_for_timeout(3000)
                 
                 # Track how many GetCalendarGraph calls we've seen so far

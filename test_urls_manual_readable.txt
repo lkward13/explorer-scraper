@@ -1,0 +1,61 @@
+================================================================================
+FAILING ROUTES TO TEST MANUALLY (Getting 0 similar dates in scraper)
+================================================================================
+
+1. ATL → Miami ($58)
+   Dates: Jan 11-20, 2026
+   URL: https://www.google.com/travel/flights/search?tfs=CBwQAhooagcIARIDQVRMEgoyMDI2LTAxLTExcgcIARIDTUlBGgoyMDI2LTAxLTIwcAGCAQsI____________AUABSAGYAQE
+   
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20ATL%20to%20MIA%20on%202026-01-11%20return%202026-01-20
+
+2. LAX → Las Vegas ($50)
+   Dates: Jan 11-20, 2026
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20LAX%20to%20LAS%20on%202026-01-11%20return%202026-01-20
+
+3. ATL → Antigua Guatemala ($195)
+   Dates: Feb 21-28, 2026
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20ATL%20to%20Guatemala%20City%20on%202026-02-21%20return%202026-02-28
+
+4. LAX → Copan Ruinas ($228)
+   Dates: Jan 11-20, 2026
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20LAX%20to%20San%20Pedro%20Sula%20Honduras%20on%202026-01-11%20return%202026-01-20
+
+5. LAX → Aruba ($306)
+   Dates: Jan 11-20, 2026
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20LAX%20to%20AUA%20on%202026-01-11%20return%202026-01-20
+
+================================================================================
+SUCCESSFUL ROUTES (for comparison - these DO return calendar data)
+================================================================================
+
+1. ATL → San Juan (SJU) ($171) - Found 22 similar dates
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20ATL%20to%20SJU%20on%202026-01-11%20return%202026-01-20
+
+2. LAX → San Juan (SJU) ($252) - Found 20 similar dates
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20LAX%20to%20SJU%20on%202026-01-11%20return%202026-01-20
+
+3. ATL → Stockholm (ARN) ($441) - Found 92 similar dates
+   Simple URL: https://www.google.com/travel/flights?q=flights%20from%20ATL%20to%20ARN%20on%202026-01-11%20return%202026-01-20
+
+================================================================================
+ALTERNATIVE: Manual Search
+================================================================================
+Or just go to https://www.google.com/travel/flights and manually search:
+- From: ATL, To: MIA, Dates: Jan 11-20, 2026
+- From: LAX, To: LAS, Dates: Jan 11-20, 2026
+- etc.
+
+Then click "Date grid" or "Price graph" to see if calendar data appears.
+
+================================================================================
+WHAT TO CHECK:
+================================================================================
+1. Does the "Date grid" or "Price graph" button exist on the results page?
+2. When you click it, does a calendar/graph appear with prices?
+3. Are there prices shown for different date combinations?
+4. Or is the calendar empty/blank?
+
+This will tell us if Google actually provides calendar data for these routes,
+or if they simply don't offer it for certain route types (short domestic, 
+small destinations, etc.)
+
