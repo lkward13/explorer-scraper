@@ -25,6 +25,145 @@ class DealSelector:
         """
         self.conn = psycopg2.connect(connection_string)
     
+    def _calculate_deal_quality_score(self, deal: Dict) -> Dict:
+        """
+        Calculate deal quality score using our price insights.
+        
+        Args:
+            deal: Deal dictionary with origin, destination, price
+            
+        Returns:
+            {
+                'score': 0-100,  # Higher = better deal
+                'quality': 'excellent' | 'great' | 'good' | 'fair' | 'unknown',
+                'insight': 'X% below typical price',
+                'confidence': 'high' | 'medium' | 'low',
+                'typical_price': int,
+                'discount_pct': float
+            }
+        """
+        cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Get price insights for this route
+        cursor.execute("""
+            SELECT typical_price, low_price_threshold, min_price_seen, 
+                   sample_size, data_quality
+            FROM route_price_insights
+            WHERE origin = %s AND destination = %s
+        """, (deal['origin'], deal['destination']))
+        
+        insights = cursor.fetchone()
+        cursor.close()
+        
+        if not insights:
+            # No historical data yet - use basic heuristics
+            return {
+                'score': 50,
+                'quality': 'unknown',
+                'insight': 'New route - no historical data yet',
+                'confidence': 'low',
+                'typical_price': None,
+                'discount_pct': 0
+            }
+        
+        price = deal['price']
+        typical = insights['typical_price']
+        low_threshold = insights['low_price_threshold']
+        min_seen = insights['min_price_seen']
+        data_quality = insights['data_quality']
+        
+        # Calculate how good this deal is
+        discount_pct = ((typical - price) / typical * 100) if typical > 0 else 0
+        
+        # Score calculation (0-100)
+        if price <= min_seen:
+            score = 100  # Best price ever!
+            quality = 'excellent'
+            insight = f'Best price ever! {int(discount_pct)}% below typical'
+        elif price <= low_threshold:
+            # Great deal - between best ever and 25th percentile
+            score = 85 + (low_threshold - price) / (low_threshold - min_seen) * 15
+            quality = 'great'
+            insight = f'{int(discount_pct)}% below typical price'
+        elif price <= typical:
+            # Good deal - between 25th percentile and median
+            score = 60 + (typical - price) / (typical - low_threshold) * 25
+            quality = 'good'
+            insight = f'{int(discount_pct)}% below typical price'
+        else:
+            # Fair or poor - above median
+            score = max(0, 60 - (price - typical) / typical * 100)
+            quality = 'fair'
+            insight = f'{int(abs(discount_pct))}% above typical price'
+        
+        return {
+            'score': round(score, 1),
+            'quality': quality,
+            'insight': insight,
+            'confidence': data_quality,  # 'high', 'medium', or 'low'
+            'typical_price': typical,
+            'discount_pct': round(discount_pct, 1)
+        }
+    
+    def select_daily_deals_with_scoring(
+        self,
+        origins: Optional[List[str]] = None,
+        max_price: int = 600,
+        min_quality_score: int = 60,
+        dedup_days: int = 21,
+        limit_per_origin: int = 10
+    ) -> List[Dict]:
+        """
+        Select deals with quality scoring based on price insights.
+        
+        Args:
+            origins: List of origin airports (None = all origins)
+            max_price: Maximum price threshold
+            min_quality_score: Only include deals scoring >= this (0-100)
+            dedup_days: Don't send same route within X days
+            limit_per_origin: Max destinations to consider per origin
+            
+        Returns:
+            List of deals sorted by quality score (best first), each with:
+            {
+                'origin': 'DFW',
+                'destination': 'BCN',
+                'price': 450,
+                'quality': {
+                    'score': 92.5,
+                    'quality': 'great',
+                    'insight': '32% below typical price',
+                    'confidence': 'high',
+                    'typical_price': 660,
+                    'discount_pct': 31.8
+                },
+                ... other deal fields ...
+            }
+        """
+        # Get unposted deals
+        deals_by_origin = self._get_unposted_deals(
+            origins=origins,
+            max_price=max_price,
+            dedup_days=dedup_days,
+            limit_per_origin=limit_per_origin
+        )
+        
+        # Score each deal
+        scored_deals = []
+        for origin, deals in deals_by_origin.items():
+            for deal in deals:
+                quality = self._calculate_deal_quality_score(deal)
+                
+                # Only include deals meeting quality threshold
+                if quality['score'] >= min_quality_score:
+                    deal['quality'] = quality
+                    scored_deals.append(deal)
+        
+        # Sort by quality score (best first)
+        scored_deals.sort(key=lambda x: x['quality']['score'], reverse=True)
+        
+        return scored_deals
+    
     def select_daily_deals(
         self,
         origins: Optional[List[str]] = None,

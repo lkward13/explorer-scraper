@@ -58,3 +58,48 @@ CREATE TABLE IF NOT EXISTS scrape_runs (
 CREATE INDEX IF NOT EXISTS idx_scrape_runs_started ON scrape_runs(started_at);
 CREATE INDEX IF NOT EXISTS idx_scrape_runs_status ON scrape_runs(status);
 
+-- ============================================================================
+-- PRICE INSIGHTS TABLE
+-- Calculated statistical insights from historical deal data
+-- Updated daily by calculate_price_insights.py script
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS route_price_insights (
+    id SERIAL PRIMARY KEY,
+    
+    -- Route identification
+    origin VARCHAR(3) NOT NULL,
+    destination VARCHAR(3) NOT NULL,
+    
+    -- Statistical insights (calculated from historical data)
+    typical_price INTEGER NOT NULL,        -- Median price (50th percentile)
+    low_price_threshold INTEGER NOT NULL,  -- 25th percentile (good deal)
+    high_price_threshold INTEGER NOT NULL, -- 75th percentile (expensive)
+    min_price_seen INTEGER NOT NULL,       -- Best price ever seen
+    max_price_seen INTEGER NOT NULL,       -- Worst price ever seen
+    avg_price INTEGER NOT NULL,            -- Mean price
+    
+    -- Sample size & confidence
+    sample_size INTEGER NOT NULL,          -- How many data points used
+    first_seen TIMESTAMP NOT NULL,         -- When we started tracking this route
+    last_updated TIMESTAMP NOT NULL,       -- When insights were last recalculated
+    
+    -- Data quality indicators
+    data_quality VARCHAR(20) NOT NULL,     -- 'high', 'medium', 'low'
+    days_tracked INTEGER NOT NULL,         -- How many days we've been tracking
+    
+    -- Constraints
+    UNIQUE(origin, destination)
+);
+
+-- Indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_route_insights_lookup ON route_price_insights(origin, destination);
+CREATE INDEX IF NOT EXISTS idx_route_insights_quality ON route_price_insights(data_quality);
+CREATE INDEX IF NOT EXISTS idx_route_insights_updated ON route_price_insights(last_updated);
+
+-- Comments for documentation
+COMMENT ON TABLE route_price_insights IS 'Statistical price insights calculated from historical deal data';
+COMMENT ON COLUMN route_price_insights.typical_price IS 'Median price - best indicator of "normal" price';
+COMMENT ON COLUMN route_price_insights.low_price_threshold IS '25th percentile - prices below this are good deals';
+COMMENT ON COLUMN route_price_insights.data_quality IS 'high: 30+ samples, medium: 14-29 samples, low: 7-13 samples';
+
