@@ -7,6 +7,7 @@ import asyncio
 import json
 import urllib.parse
 import re
+import random
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from playwright.async_api import async_playwright, BrowserContext
@@ -140,10 +141,18 @@ async def expand_deal_via_api(
         range4_end = (today + timedelta(days=330)).strftime('%Y-%m-%d')  # ~11 months
         
         # Make 4 parallel API calls
-        task1 = fetch_calendar_graph(context, origin, destination, outbound_date, return_date, range1_start, range1_end)
-        task2 = fetch_calendar_graph(context, origin, destination, outbound_date, return_date, range2_start, range2_end)
-        task3 = fetch_calendar_graph(context, origin, destination, outbound_date, return_date, range3_start, range3_end)
-        task4 = fetch_calendar_graph(context, origin, destination, outbound_date, return_date, range4_start, range4_end)
+        # Add random jitter (0.5-2s) between API calls to avoid rate limiting
+        async def fetch_with_jitter(delay_ms, *args):
+            await asyncio.sleep(delay_ms / 1000.0)
+            return await fetch_calendar_graph(*args)
+        
+        # Stagger the 4 API calls with random delays
+        jitters = [0, random.uniform(500, 2000), random.uniform(500, 2000), random.uniform(500, 2000)]
+        
+        task1 = fetch_with_jitter(jitters[0], context, origin, destination, outbound_date, return_date, range1_start, range1_end)
+        task2 = fetch_with_jitter(jitters[1], context, origin, destination, outbound_date, return_date, range2_start, range2_end)
+        task3 = fetch_with_jitter(jitters[2], context, origin, destination, outbound_date, return_date, range3_start, range3_end)
+        task4 = fetch_with_jitter(jitters[3], context, origin, destination, outbound_date, return_date, range4_start, range4_end)
         
         results = await asyncio.gather(task1, task2, task3, task4)
         

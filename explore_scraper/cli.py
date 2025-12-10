@@ -136,18 +136,15 @@ async def run(
             cards = parse_cards_from_html(html)
         
         if not cards:
-            print("[error] No destination cards found in response", file=sys.stderr)
+            error_msg = "No destination cards found in response"
             if not use_browser and not enhanced_mode:
-                print("[info] Try using --use-browser to enable JavaScript rendering", file=sys.stderr)
-            sys.exit(1)
+                error_msg += " (try using --use-browser to enable JavaScript rendering)"
+            raise RuntimeError(error_msg)
         
         return cards
     except Exception as e:
-        print(f"[error] Scraping failed: {e}", file=sys.stderr)
-        if verbose:
-            import traceback
-            traceback.print_exc()
-        sys.exit(1)
+        # Re-raise the exception so it can be handled by the caller
+        raise
 
 
 def main():

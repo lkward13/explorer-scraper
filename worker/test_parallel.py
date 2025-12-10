@@ -86,11 +86,17 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
     async def scrape_region(region: str, retry_count: int = 0, max_retries: int = 1):
         """Scrape a single region with retry logic."""
         try:
+            # Import the programmatic TFS generator
+            from explore_scraper.region_tfs_generator import build_explore_url_for_region
+            
+            # Build TFS URL programmatically (no pre-collected data needed)
+            tfs_url = build_explore_url_for_region(origin, region)
+            
             result = await explore_run(
-                tfs_url=None,
+                tfs_url=tfs_url,
                 tfs_blob=None,
-                origin_airport=origin,
-                region=region,
+                origin_airport=None,  # Not needed when using tfs_url
+                region=None,  # Not needed when using tfs_url
                 html_file=None,
                 use_browser=True,  # Browser required (HTTP consistently blocked)
                 enhanced_mode=False,
@@ -123,6 +129,16 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
         except Exception as e:
             error_msg = str(e)
             
+            # Special handling for rate limiting (no cards found)
+            if 'No destination cards found' in error_msg:
+                if retry_count < max_retries:
+                    print(f"  ⟳ {origin} → {region}: Rate limited, waiting 60s before retry...")
+                    await asyncio.sleep(60)  # Wait 1 minute to let rate limit reset
+                    return await scrape_region(region, retry_count + 1, max_retries)
+                else:
+                    print(f"  ✗ {origin} → {region}: Rate limited (max retries reached)")
+                    return []
+            
             # Retry on connection/network errors
             if retry_count < max_retries and any(err in error_msg for err in ['ERR_SOCKET', 'net::ERR', 'timeout', 'Connection', 'closed']):
                 if verbose:
@@ -148,11 +164,17 @@ async def run_explore_for_origin(origin: str, regions: List[str] = None, verbose
 
 def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region_filter: str = None) -> List[dict]:
     """
-    Select top N deals per origin.
+    Select top N deals per region per origin, with regional diversity.
+    
+    Strategy: Take top deals_per_origin from EACH region to ensure we check
+    Asia/Australia/etc even if Europe/Caribbean are cheaper overall.
+    
+    This means if deals_per_origin=5 and we have 9 regions, we'll expand
+    up to 45 deals per origin (5 × 9 regions).
     
     Args:
         cards: List of deal cards from Explore
-        deals_per_origin: Number of deals to select per origin
+        deals_per_origin: Number of deals to select PER REGION (not total)
         region_filter: Optional region to filter by (e.g., 'europe')
     
     Returns:
@@ -160,12 +182,119 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region
     """
     # City to IATA mapping for common destinations
     CITY_TO_IATA = {
+        # Western Europe
         'Dublin': 'DUB', 'Barcelona': 'BCN', 'Madrid': 'MAD', 'Lisbon': 'LIS',
         'Helsinki': 'HEL', 'Amsterdam': 'AMS', 'Zürich': 'ZRH', 'Stockholm': 'ARN',
         'Paris': 'CDG', 'London': 'LHR', 'Rome': 'FCO', 'Athens': 'ATH',
+        'Milan': 'MXP', 'Porto': 'OPO', 'Nice': 'NCE', 'Edinburgh': 'EDI',
+        'Geneva': 'GVA', 'Lyon': 'LYS', 'Toulouse': 'TLS', 'Bologna': 'BLQ',
+        'Palermo': 'PMO', 'Catania': 'CTA', 'Seville': 'SVQ', 'Bilbao': 'BIO',
+        'Valencia': 'VLC', 'Malaga': 'AGP', 'Reykjavik': 'KEF', 'Reykjavík': 'KEF',
+        'Larnaca': 'LCA', 'Limassol': 'LCA', 'Nicosia': 'LCA', 'Ayia Napa': 'LCA',
+        'Paphos': 'PFO', 'Dubrovnik': 'DBV', 'Moscow': 'SVO', 'Rovaniemi': 'RVN',
+        'Santorini': 'JTR', 'Glasgow': 'GLA', 'Malta': 'MLA', 'Mykonos': 'JMK',
+        'Manchester': 'MAN', 'Bordeaux': 'BOD', 'Luxembourg': 'LUX', 'Majorca': 'PMI',
+        
+        # Eastern Europe
+        'Kraków': 'KRK', 'Florence': 'FLR', 'Naples': 'NAP', 'Venice': 'VCE',
+        'Prague': 'PRG', 'Budapest': 'BUD', 'Vienna': 'VIE', 'Warsaw': 'WAW',
+        'Copenhagen': 'CPH', 'Oslo': 'OSL', 'Brussels': 'BRU',
+        'Frankfurt': 'FRA', 'Munich': 'MUC', 'Berlin': 'BER',
+        
+        # Caribbean & Central America
         'San Juan': 'SJU', 'Aruba': 'AUA', 'Cayman Islands': 'GCM', 'Anguilla': 'AXA',
         'El Yunque National Forest': 'SJU',  # Use San Juan for El Yunque
-        'Tokyo': 'NRT', 'Sydney': 'SYD', 'Cancun': 'CUN'
+        'Cancun': 'CUN', 'Cancún': 'CUN',
+        'Punta Cana': 'PUJ', 'La Romana': 'LRM',
+        'Sint Maarten': 'SXM',
+        'Saint Lucia': 'UVF', 'Barbados': 'BGI', 'Bonaire': 'BON', 'Curaçao': 'CUR',
+        'Granada': 'GRX', 'San Salvador': 'SAL', 'Boquete': 'DAV',
+        'Placencia': 'PLJ', 'San Juan del Sur': 'MGA',
+        
+        # Central America
+        'Guatemala City': 'GUA', 'Antigua Guatemala': 'GUA',
+        'Lake Atitlán': 'GUA', 'Semuc Champey': 'GUA', 'Panajachel': 'GUA',
+        
+        # South America
+        'Bogotá': 'BOG', 'Cartagena': 'CTG',
+        'Cuenca': 'CUE', 'Guayaquil': 'GYE',
+        'Monteverde': 'SJO',  # Costa Rica - use San Jose
+        'Punta del Este': 'PDP', 'Salvador': 'SSA', 'Santa Marta': 'SMR',
+        'Rio de Janeiro': 'GIG', 'Salta': 'SLA', 'Brasília': 'BSB',
+        'São Paulo': 'GRU', 'Mendoza': 'MDZ', 'Buenos Aires': 'EZE',
+        'Cusco': 'CUZ', 'Manaus': 'MAO', 'Ushuaia': 'USH', 'Valparaíso': 'SCL',
+        
+        # Asia
+        'Tokyo': 'NRT', 'Sydney': 'SYD',
+        'Hong Kong': 'HKG',
+        'Taipei City': 'TPE', 'Taipei': 'TPE',
+        'Hyderabad': 'HYD',
+        'Jerusalem': 'TLV', 'Tel Aviv-Yafo': 'TLV', 'Dubai': 'DXB', 'Abu Dhabi': 'AUH',
+        'Bahrain': 'BAH', 'Antalya': 'AYT', 'Cappadocia': 'ASR', 'Salalah': 'SLL',
+        'Petra': 'AMM', 'Tehran': 'IKA', 'Riyadh': 'RUH', 'Kuwait City': 'KWI',
+        'Erbil': 'EBL', 'Doha': 'DOH', 'Amman': 'AMM', 'Sharjah': 'SHJ',
+        'Bali': 'DPS', 'Phuket': 'HKT', 'Chiang Mai': 'CNX', 'Hanoi': 'HAN',
+        'Ho Chi Minh City': 'SGN', 'Siem Reap': 'REP', 'Kathmandu': 'KTM',
+        'Colombo': 'CMB', 'Manila': 'MNL', 'Cebu': 'CEB', 'Seoul': 'ICN',
+        'Osaka': 'KIX', 'Bangkok': 'BKK', 'Singapore': 'SIN', 'Kuala Lumpur': 'KUL',
+        'Jakarta': 'CGK', 'Delhi': 'DEL', 'Mumbai': 'BOM', 'Bangalore': 'BLR',
+        
+        # Oceania
+        'Auckland': 'AKL', 'Christchurch': 'CHC', 'Queenstown': 'ZQN',
+        'Melbourne': 'MEL', 'Brisbane': 'BNE', 'Perth': 'PER', 'Fiji': 'NAN',
+        'Rangiroa': 'RGI',
+        
+        # Africa
+        'Cape Town': 'CPT',
+        'Stellenbosch': 'CPT', 'Hermanus': 'CPT', 'Franschhoek': 'CPT', 'Paarl': 'CPT',
+        'Marrakech': 'RAK', 'Casablanca': 'CMN', 'Nairobi': 'NBO', 'Zanzibar': 'ZNZ',
+        'Johannesburg': 'JNB', 'Durban': 'DUR', 'Victoria Falls': 'VFA',
+        'Addis Ababa': 'ADD', 'Cairo': 'CAI', 'Luxor': 'LXR', 'Sharm el-Sheikh': 'SSH',
+        
+        # French Polynesia
+        'Tahiti': 'PPT', "Mo'orea": 'MOZ', 'Bora Bora': 'BOB',
+        'Raiatea': 'RFP', "Taha'a": 'RFP', 'Huahine-Iti': 'HUH',
+        
+        # North America
+        'Mexico City': 'MEX', 'Halifax': 'YHZ', 'Charlottetown': 'YYG',
+        'Montreal': 'YUL', 'Anchorage': 'ANC', 'Puerto Vallarta': 'PVR',
+        'Honolulu': 'HNL', 'Québec City': 'YQB', 'San Diego': 'SAN',
+        'Washington, D.C.': 'DCA', 'New Orleans': 'MSY', 'Toronto': 'YYZ',
+        'Kauai': 'LIH', 'Bozeman': 'BZN', 'Fairbanks': 'FAI',
+        "Peggy's Cove": 'YHZ', 'Denali National Park and Preserve': 'FAI',
+        'Hawaiʻi Volcanoes National Park': 'ITO', 'Haleiwa': 'HNL',
+        
+        # Additional Caribbean/Central America
+        'Roatán': 'RTB', 'Puerto Plata': 'POP', 'Montego Bay': 'MBJ',
+        'Ocho Rios': 'MBJ', 'Negril': 'MBJ', 'Providenciales': 'PLS',
+        'Freeport': 'FPO', 'Nassau': 'NAS', 'Antigua': 'ANU',
+        'Nosara': 'NOB', 'Puntarenas': 'SJO', 'Dominical': 'SJO',
+        'Parque Nacional Volcán Arenal': 'SJO', 'Parque Nacional Tortuguero': 'SJO',
+        'Parque Nacional Volcán Tenorio': 'LIR', 'Copan Ruinas': 'SAP',
+        'Quetzaltenango': 'GUA', 'León': 'MGA', 'San Juan del Sur': 'MGA',
+        
+        # Additional South America
+        'Machu Picchu': 'CUZ', 'Historic Sanctuary of Machu Picchu': 'CUZ',
+        'Ollantaytambo': 'CUZ', 'Parque Nacional Natural Tayrona': 'SMR',
+        'Puerto Viejo de Talamanca': 'SJO',
+        
+        # Additional Asia
+        'Kyoto': 'KIX', 'Beijing': 'PEK', 'Da Nang': 'DAD', 'Kochi': 'COK',
+        'Bengaluru': 'BLR', 'Agra': 'DEL', 'Jaipur': 'JAI', 'Goa': 'GOI',
+        
+        # Additional Europe
+        'Mykonos': 'JMK', 'Luxembourg': 'LUX', 'Bordeaux': 'BOD',
+        'Manchester': 'MAN', 'Glasgow': 'GLA', 'Kazan': 'KZN',
+        'Terceira Island': 'TER', 'Pico Island': 'PIX', 'Longyearbyen': 'LYR',
+        'Gudauri': 'TBS',
+        
+        # Additional Middle East/Africa
+        'Giza': 'CAI', 'Bosphorus': 'IST', 'Dead Sea': 'AMM',
+        'Pretoria': 'JNB', 'Pilanesberg National Park': 'JNB',
+        'Cradle of Humankind': 'JNB', 'Gansbaai': 'CPT', 'Knysna': 'GRJ',
+        
+        # Special regions
+        'Amalfi': 'NAP',  # Amalfi Coast uses Naples airport
     }
     
     # Filter by region if specified
@@ -180,7 +309,7 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region
             by_origin[origin] = []
         by_origin[origin].append(card)
     
-    # Select top N per origin (prioritize regional diversity, then price)
+    # Select top N per region per origin (ensures regional diversity)
     selected = []
     for origin, origin_cards in by_origin.items():
         # Group by region first to ensure diversity
@@ -191,46 +320,41 @@ def select_top_deals_per_origin(cards: List[dict], deals_per_origin: int, region
                 by_region[region] = []
             by_region[region].append(card)
         
-        # Take cheapest deal from each region
-        region_best = []
+        # Take top deals_per_origin from EACH region
+        # This means we'll expand up to (deals_per_origin × num_regions) deals per origin
+        origin_selected = []
         for region, region_cards in by_region.items():
-            cheapest = min(region_cards, key=lambda x: x.get('min_price', 9999))
-            region_best.append(cheapest)
+            # Sort by price and take top N from this region
+            region_sorted = sorted(region_cards, key=lambda x: x.get('min_price', 9999))
+            origin_selected.extend(region_sorted[:deals_per_origin])
         
-        # If we have fewer regions than deals_per_origin, add more deals from cheapest regions
-        if len(region_best) < deals_per_origin:
-            # Sort all cards by price and add until we reach deals_per_origin
-            all_sorted = sorted(origin_cards, key=lambda x: x.get('min_price', 9999))
-            # Remove duplicates already in region_best
-            region_best_dests = {c.get('destination') for c in region_best}
-            for card in all_sorted:
-                if card.get('destination') not in region_best_dests:
-                    region_best.append(card)
-                    if len(region_best) >= deals_per_origin:
-                        break
-        
-        # Sort by price and take top N
-        sorted_cards = sorted(region_best, key=lambda x: x.get('min_price', 9999))
-        top_cards = sorted_cards[:deals_per_origin]
+        # Sort final selection by price (for logging/display purposes)
+        sorted_cards = sorted(origin_selected, key=lambda x: x.get('min_price', 9999))
+        # DON'T limit to deals_per_origin here - we want ALL selected deals from all regions!
         
         # Convert to expansion format
-        for card in top_cards:
+        for card in sorted_cards:
             dest_name = card.get('destination')
             dest_iata = CITY_TO_IATA.get(dest_name, dest_name)  # Fallback to name if not in map
+            
+            # Track if this is a city name (not in mapping and not already an IATA code)
+            is_unmapped_city = (dest_name != dest_iata and dest_name not in CITY_TO_IATA and len(dest_name) > 3)
             
             selected.append({
                 'origin': origin,
                 'destination': dest_iata,
+                'destination_name': dest_name,  # Keep original name for logging
                 'start_date': card.get('start_date'),
                 'end_date': card.get('end_date'),
                 'price': card.get('min_price'),
-                'search_region': card.get('search_region')
+                'search_region': card.get('search_region'),
+                'is_unmapped_city': is_unmapped_city
             })
     
     return selected
 
 
-async def run_test_phase(phase: int, verbose: bool = True, override_config: dict = None, use_api: bool = False):
+async def run_test_phase(phase: int, verbose: bool = True, override_config: dict = None, use_api: bool = False, save_to_db: bool = False):
     """
     Run a specific test phase.
     
@@ -238,6 +362,8 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
         phase: Phase number (1-3)
         verbose: Print detailed progress
         override_config: Optional config dict to override phase defaults
+        use_api: Whether to use API-based expansion
+        save_to_db: Whether to save results to PostgreSQL database
     
     Returns:
         Test results
@@ -248,17 +374,38 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     
     config = override_config if override_config else PHASES[phase]
     
+    # Support separate browser counts for explore vs expansion
+    explore_browsers = config.get('explore_browsers', config['browsers'])
+    expansion_browsers = config['browsers']
+    
     print(f"\n{'='*80}")
     print(f"PHASE {phase}: {config['name']}")
     print(f"{'='*80}")
     print(f"Description:      {config['description']}")
     print(f"Origins:          {len(config['origins'])} ({', '.join(config['origins'])})")
-    print(f"Browsers:         {config['browsers']}")
+    print(f"Explore browsers: {explore_browsers}")
+    print(f"Expansion browsers: {expansion_browsers}")
     print(f"Deals per origin: {config['deals_per_origin']}")
     print(f"Expected deals:   {len(config['origins']) * config['deals_per_origin']}")
     print(f"{'='*80}\n")
     
     overall_start = datetime.now()
+    
+    # Database setup (if enabled)
+    db = None
+    run_id = None
+    if save_to_db:
+        try:
+            from database.db import DealsDatabase
+            from database.config import get_connection_string
+            db = DealsDatabase(get_connection_string())
+            run_id = db.create_scrape_run(len(config['origins']))
+            if verbose:
+                print(f"[DB] Created scrape run #{run_id}")
+        except Exception as e:
+            print(f"[DB] Warning: Could not connect to database: {e}")
+            print(f"[DB] Continuing without database storage...")
+            db = None
     
     # STEP 1: Run Explore for all origins (BATCHED PARALLEL with staggered starts)
     print(f"STEP 1: Explore Scraping (Batched Parallel)")
@@ -297,8 +444,10 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
             origin = batch[i]
             if isinstance(result, Exception):
                 print(f"  ✗ {origin}: Failed - {str(result)[:50]}")
-                # Retry failed origin once
+                # Retry failed origin once with delay
                 try:
+                    print(f"     Waiting 30s before retry...")
+                    await asyncio.sleep(30)  # Give rate limits time to reset
                     print(f"     Retrying {origin}...")
                     retry_result = await run_explore_for_origin(origin, regions=regions_to_scrape, verbose=False)
                     all_cards.extend(retry_result)
@@ -308,6 +457,11 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
             else:
                 all_cards.extend(result)
                 print(f"  ✓ {origin}: {len(result)} cards")
+        
+        # Add delay between batches to avoid rate limiting
+        if batch_num + BATCH_SIZE < len(origins):  # Not the last batch
+            print(f"  ⏸️  Waiting 15 seconds before next batch...")
+            await asyncio.sleep(15)
     
     explore_time = (datetime.now() - explore_start).total_seconds()
     print(f"\n✓ Explore complete: {len(all_cards)} cards in {explore_time:.1f}s ({explore_time/60:.1f} min)")
@@ -316,8 +470,8 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     print(f"\nSTEP 2: Deal Selection")
     print(f"-" * 80)
     
-    # For Phase 3+, scrape all regions; for Phase 1-2, focus on Europe only
-    region_filter = None if phase >= 3 else 'europe'
+    # Scrape all regions (no filtering)
+    region_filter = None
     
     expansion_candidates = select_top_deals_per_origin(
         all_cards,
@@ -344,7 +498,7 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     use_api_mode = use_api if use_api else config.get('use_api', False)
     
     worker_pool = ParallelWorkerPool(
-        num_browsers=config['browsers'],
+        num_browsers=expansion_browsers,  # Use expansion_browsers for expansion phase
         verbose=verbose,
         use_api=use_api_mode
     )
@@ -352,6 +506,27 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     results = await worker_pool.process_expansions(expansion_candidates)
     
     expansion_time = (datetime.now() - expansion_start).total_seconds()
+    
+    # Log unmapped cities that returned 0 results
+    unmapped_cities_with_zero_results = []
+    for candidate in expansion_candidates:
+        if candidate.get('is_unmapped_city'):
+            # Check if this expansion returned 0 results
+            matching_result = next((r for r in results if r['origin'] == candidate['origin'] and r['destination'] == candidate['destination']), None)
+            if matching_result and len(matching_result.get('similar_dates', [])) == 0:
+                unmapped_cities_with_zero_results.append({
+                    'city_name': candidate['destination_name'],
+                    'used_code': candidate['destination'],
+                    'route': f"{candidate['origin']}→{candidate['destination_name']}"
+                })
+    
+    if unmapped_cities_with_zero_results:
+        print(f"\n⚠️  UNMAPPED CITIES WITH 0 RESULTS (need IATA codes):")
+        seen = set()
+        for item in unmapped_cities_with_zero_results:
+            if item['city_name'] not in seen:
+                print(f"  '{item['city_name']}': '???',  # Example route: {item['route']}")
+                seen.add(item['city_name'])
     
     # STEP 4: Summary
     total_time = (datetime.now() - overall_start).total_seconds()
@@ -379,6 +554,86 @@ async def run_test_phase(phase: int, verbose: bool = True, override_config: dict
     
     print(f"\nValid deals (≥5 dates): {len(valid_deals)}")
     print(f"{'='*80}\n")
+    
+    # STEP 5: Save to database (if enabled)
+    if db and run_id:
+        print(f"STEP 5: Saving to Database")
+        print(f"-" * 80)
+        
+        try:
+            # Import URL builder
+            from explore_scraper.tfs_builder import build_round_trip_flight_url
+            
+            # Transform results to database format
+            deals_to_insert = []
+            for result in results:
+                item = result['item']
+                similar_deals = result['result'].get('similar_deals', [])
+                
+                # Only save valid deals (≥5 similar dates)
+                if len(similar_deals) >= 5:
+                    # Save ALL similar dates (not just one)
+                    for deal in similar_deals:
+                        # Generate Google Flights URL for this specific date combo
+                        url = build_round_trip_flight_url(
+                            origin=item['origin'],
+                            destination=item['destination'],
+                            outbound_date=deal['outbound_date'],
+                            return_date=deal['return_date']
+                        )
+                        
+                        deals_to_insert.append({
+                            'origin': item['origin'],
+                            'destination': item['destination'],
+                            'destination_city': item.get('destination_name'),  # Use original city name
+                            'outbound_date': deal['outbound_date'],
+                            'return_date': deal['return_date'],
+                            'price': deal['price'],
+                            'reference_price': item['price'],
+                            'search_region': item.get('search_region'),
+                            'duration': None,  # Not available in expansion phase
+                            'similar_date_count': len(similar_deals),
+                            'google_flights_url': url,
+                            'scrape_run_id': run_id
+                        })
+            
+            # Insert deals
+            if deals_to_insert:
+                inserted = db.insert_expanded_deals(deals_to_insert)
+                print(f"✓ Inserted {inserted} deals ({len(valid_deals)} routes × avg {inserted//len(valid_deals) if valid_deals else 0} dates each)")
+            else:
+                print(f"No valid deals to insert")
+            
+            # Update scrape run stats
+            db.complete_scrape_run(run_id, {
+                'cards_found': len(all_cards),
+                'expansions_attempted': len(expansion_candidates),
+                'expansions_succeeded': len(results),
+                'valid_deals': len(valid_deals)
+            })
+            
+            # Show database stats
+            stats = db.get_stats()
+            print(f"\n📊 Database Statistics:")
+            print(f"  Total deals: {stats.get('total_deals', 0)}")
+            print(f"  Unposted deals: {stats.get('unposted_deals', 0)}")
+            print(f"  Unique routes: {stats.get('unique_routes', 0)}")
+            print(f"{'='*80}\n")
+            
+        except Exception as e:
+            print(f"[DB] Error saving to database: {e}")
+            import traceback
+            traceback.print_exc()
+            if run_id:
+                try:
+                    db.complete_scrape_run(run_id, {
+                        'cards_found': len(all_cards),
+                        'expansions_attempted': len(expansion_candidates),
+                        'expansions_succeeded': len(results),
+                        'valid_deals': 0
+                    })
+                except:
+                    pass
     
     return {
         'phase': phase,

@@ -79,6 +79,60 @@ def build_explore_url_for_origin(airport_code: str, hl: str = "en", curr: str = 
     return f"https://www.google.com/travel/explore?tfs={tfs}&hl={hl}&tfu=GgA&curr={curr}"
 
 
+def build_round_trip_flight_url(
+    origin: str, 
+    destination: str, 
+    outbound_date: str, 
+    return_date: str,
+    hl: str = "en",
+    gl: str = "us"
+) -> str:
+    """
+    Build a Google Flights URL for a specific round-trip flight.
+    
+    Args:
+        origin: Origin airport IATA code (e.g., "DFW")
+        destination: Destination airport IATA code (e.g., "LHR")
+        outbound_date: Departure date in YYYY-MM-DD format
+        return_date: Return date in YYYY-MM-DD format
+        hl: UI language (default: "en")
+        gl: Country code (default: "us")
+        
+    Returns:
+        Complete Google Flights URL for this specific flight
+        
+    Example:
+        >>> build_round_trip_flight_url("DFW", "LHR", "2026-01-15", "2026-01-22")
+        "https://www.google.com/travel/flights?tfs=CBwQAhooagwIAhIIL20vMDJ3enZyEgoyMDI2LTAxLTE1..."
+    """
+    origin = origin.upper()
+    destination = destination.upper()
+    
+    # Build the Info message for a specific round-trip flight
+    info = flights_pb2.Info()
+    info.seat = flights_pb2.ECONOMY
+    info.trip = flights_pb2.ROUND_TRIP
+    info.passengers.append(flights_pb2.ADULT)
+    
+    # data[0]: Outbound flight
+    d1 = info.data.add()
+    d1.from_flight.airport = origin
+    d1.to_flight.airport = destination
+    d1.date = outbound_date
+    
+    # data[1]: Return flight
+    d2 = info.data.add()
+    d2.from_flight.airport = destination
+    d2.to_flight.airport = origin
+    d2.date = return_date
+    
+    # Serialize and encode
+    raw = info.SerializeToString()
+    tfs = base64.urlsafe_b64encode(raw).decode("utf-8").rstrip("=")
+    
+    return f"https://www.google.com/travel/flights?tfs={tfs}&hl={hl}&gl={gl}"
+
+
 # Test function
 if __name__ == "__main__":
     # Test with various airports
