@@ -232,6 +232,156 @@ class EmailBuilder:
             'html': html.strip(),
             'text': text.strip()
         }
+    
+    def build_digest_email(self, deals: List[Dict], title: str = "Today's Flight Deals") -> Dict[str, str]:
+        """
+        Build a single digest email with all deals grouped by origin.
+        
+        Args:
+            deals: List of deal dicts with quality scoring
+            title: Email title
+            
+        Returns:
+            {
+                'subject': 'Email subject',
+                'html': 'HTML body',
+                'text': 'Plain text body'
+            }
+        """
+        # Group deals by origin
+        deals_by_origin = {}
+        for deal in deals:
+            origin = deal['origin']
+            if origin not in deals_by_origin:
+                deals_by_origin[origin] = []
+            deals_by_origin[origin].append(deal)
+        
+        subject = f"✈️ {title} - {len(deals)} Deals from {len(deals_by_origin)} Airports"
+        
+        # Build HTML sections for each origin
+        origin_sections_html = ""
+        origin_sections_text = ""
+        
+        for origin in sorted(deals_by_origin.keys()):
+            origin_deals = deals_by_origin[origin]
+            
+            # Origin header
+            origin_sections_html += f"""
+            <div style="margin: 30px 0;">
+                <h2 style="color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; margin-bottom: 20px;">
+                    From {origin} ({len(origin_deals)} deals)
+                </h2>
+            """
+            
+            origin_sections_text += f"\n\n{'='*60}\nFrom {origin} ({len(origin_deals)} deals)\n{'='*60}\n"
+            
+            # Deals for this origin
+            for deal in origin_deals:
+                city = deal.get('destination_city') or deal['destination']
+                price = deal['price']
+                dest = deal['destination']
+                url = deal['google_flights_url']
+                
+                origin_sections_html += f"""
+                <div style="background: white; border-left: 4px solid #667eea; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h3 style="margin: 0; font-size: 22px; color: #1f2937;">{city}</h3>
+                            <div style="color: #6b7280; font-size: 14px; margin-top: 4px;">({dest})</div>
+                        </div>
+                        <div style="text-align: right; min-width: 120px;">
+                            <div style="font-size: 36px; font-weight: bold; color: #667eea; white-space: nowrap;">${price}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <a href="{url}" style="display: inline-block; background: #667eea; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 15px; font-weight: bold;">
+                            View Dates & Book →
+                        </a>
+                    </div>
+                </div>
+                """
+                
+                origin_sections_text += f"""
+{city} ({dest}) - ${price}
+  Book: {url}
+
+"""
+            
+            origin_sections_html += "</div>"
+        
+        # Complete HTML
+        html = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f3f4f6; margin: 0; padding: 0; }}
+                .container {{ max-width: 800px; margin: 0 auto; background: white; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                           color: white; padding: 40px 30px; text-align: center; }}
+                .header h1 {{ margin: 0; font-size: 32px; }}
+                .header p {{ margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }}
+                .content {{ padding: 30px; background: #f9fafb; }}
+                .footer {{ text-align: center; padding: 30px; color: #999; font-size: 14px; background: white; }}
+                .stats {{ display: flex; justify-content: space-around; background: white; padding: 20px; margin: 20px 0; border-radius: 10px; }}
+                .stat {{ text-align: center; }}
+                .stat-number {{ font-size: 36px; font-weight: bold; color: #667eea; }}
+                .stat-label {{ font-size: 14px; color: #6b7280; margin-top: 5px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>✈️ {title}</h1>
+                    <p>{len(deals)} amazing deals from {len(deals_by_origin)} airports</p>
+                </div>
+                <div class="content">
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-number">{len(deals)}</div>
+                            <div class="stat-label">Total Deals</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">{len(deals_by_origin)}</div>
+                            <div class="stat-label">Airports</div>
+                        </div>
+                    </div>
+                    {origin_sections_html}
+                </div>
+                <div class="footer">
+                    <p>You're receiving this because you subscribed to flight deal alerts.</p>
+                    <p>Prices and availability subject to change. All deals are round-trip.</p>
+                    <p style="margin-top: 20px; font-size: 12px;">
+                        Quality scores based on historical price data and market analysis.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        text = f"""
+{title}
+{'='*60}
+
+{len(deals)} amazing deals from {len(deals_by_origin)} airports
+
+Stats:
+- Total Deals: {len(deals)}
+- Airports: {len(deals_by_origin)}
+
+{origin_sections_text}
+
+---
+You're receiving this because you subscribed to flight deal alerts.
+Prices and availability subject to change. All deals are round-trip.
+Quality scores based on historical price data and market analysis.
+        """
+        
+        return {
+            'subject': subject,
+            'html': html.strip(),
+            'text': text.strip()
+        }
 
 
 # Example usage

@@ -16,6 +16,19 @@ from collections import defaultdict
 class DealSelector:
     """Select and categorize flight deals for email notifications."""
     
+    # Regional price thresholds (what's considered a "good deal")
+    REGION_THRESHOLDS = {
+        'caribbean': 350,
+        'central_america': 350,
+        'south_america': 600,
+        'europe': 600,
+        'middle_east': 850,
+        'africa': 850,
+        'asia': 850,
+        'oceania': 950,
+        'pacific': 950,
+    }
+    
     def __init__(self, connection_string: str):
         """
         Initialize with database connection.
@@ -483,6 +496,176 @@ class DealSelector:
             """, (origin, destination, outbound_date, return_date))
             
             return [row[0] for row in cur.fetchall()]
+    
+    def select_deals_simple(
+        self,
+        origins: Optional[List[str]] = None,
+        cooldown_days: int = 7,
+        limit: int = 50,
+        max_price_override: Optional[int] = None
+    ) -> List[Dict]:
+        """
+        Simple price-based deal selection using regional thresholds.
+        No historical data required - just industry-standard "good deal" prices.
+        
+        Args:
+            origins: List of origin airports (None = all origins)
+            cooldown_days: Don't send same route within X days
+            limit: Maximum number of deals to return
+            max_price_override: Override all regional thresholds with this price
+            
+        Returns:
+            List of deals sorted by price (cheapest first)
+        """
+        cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Get recently sent routes
+        recently_sent = set(self.get_recently_sent_routes(days=cooldown_days))
+        
+        # Build query
+        query = """
+            SELECT DISTINCT ON (origin, destination)
+                *
+            FROM expanded_deals
+            WHERE found_at >= NOW() - INTERVAL '48 hours'
+        """
+        params = []
+        
+        if origins:
+            query += " AND origin = ANY(%s)"
+            params.append(origins)
+        
+        query += " ORDER BY origin, destination, price ASC"
+        
+        cursor.execute(query, params)
+        all_deals = cursor.fetchall()
+        cursor.close()
+        
+        # Filter by regional thresholds and cooldown
+        good_deals = []
+        for deal in all_deals:
+            # Skip recently sent routes
+            route = (deal['origin'], deal['destination'])
+            if route in recently_sent:
+                continue
+            
+            # Check price threshold
+            region = deal.get('search_region', '').lower()
+            
+            if max_price_override:
+                threshold = max_price_override
+            else:
+                threshold = self.REGION_THRESHOLDS.get(region, 600)  # Default to Europe threshold
+            
+            if deal['price'] <= threshold:
+                good_deals.append(dict(deal))
+        
+        # Sort by price (cheapest first) and limit
+        good_deals.sort(key=lambda x: x['price'])
+        return good_deals[:limit]
+    
+    def mark_deals_as_sent(
+        self,
+        deals: List[Dict],
+        recipient_email: Optional[str] = None
+    ) -> int:
+        """
+        Mark deals as sent in the sent_deals tracking table.
+        
+        Args:
+            deals: List of deal dictionaries
+            recipient_email: Email address of recipient (optional)
+            
+        Returns:
+            Number of deals marked as sent
+        """
+        cursor = self.conn.cursor()
+        count = 0
+        
+        for deal in deals:
+            cursor.execute("""
+                INSERT INTO sent_deals 
+                (origin, destination, price, outbound_date, return_date, recipient_email, deal_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                deal['origin'],
+                deal['destination'],
+                deal['price'],
+                deal['outbound_date'],
+                deal['return_date'],
+                recipient_email,
+                deal.get('id')
+            ))
+            count += 1
+        
+        self.conn.commit()
+        cursor.close()
+        return count
+    
+    def get_recently_sent_routes(self, days: int = 7) -> List[tuple]:
+        """
+        Get routes that have been sent in the last N days.
+        
+        Args:
+            days: Number of days to look back
+            
+        Returns:
+            List of (origin, destination) tuples
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT DISTINCT origin, destination
+            FROM sent_deals
+            WHERE sent_at >= NOW() - INTERVAL '%s days'
+        """, (days,))
+        
+        routes = [(row[0], row[1]) for row in cursor.fetchall()]
+        cursor.close()
+        return routes
+    
+    def select_deals_with_cooldown(
+        self,
+        origins: Optional[List[str]] = None,
+        max_price: int = 600,
+        min_quality_score: int = 70,
+        cooldown_days: int = 7,
+        limit: int = 50
+    ) -> List[Dict]:
+        """
+        Select deals with quality scoring AND cooldown logic.
+        Prevents sending the same route too frequently.
+        
+        Args:
+            origins: List of origin airports (None = all origins)
+            max_price: Maximum price threshold
+            min_quality_score: Only include deals scoring >= this (0-100)
+            cooldown_days: Don't send same route within X days
+            limit: Maximum number of deals to return
+            
+        Returns:
+            List of deals sorted by quality score (best first)
+        """
+        # Get recently sent routes
+        recently_sent = set(self.get_recently_sent_routes(days=cooldown_days))
+        
+        # Get all deals with quality scoring
+        all_deals = self.select_daily_deals_with_scoring(
+            origins=origins,
+            max_price=max_price,
+            min_quality_score=min_quality_score,
+            dedup_days=21,
+            limit_per_origin=10
+        )
+        
+        # Filter out recently sent routes
+        filtered_deals = []
+        for deal in all_deals:
+            route = (deal['origin'], deal['destination'])
+            if route not in recently_sent:
+                filtered_deals.append(deal)
+        
+        # Return top N deals
+        return filtered_deals[:limit]
     
     def close(self):
         """Close database connection."""

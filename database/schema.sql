@@ -103,3 +103,38 @@ COMMENT ON COLUMN route_price_insights.typical_price IS 'Median price - best ind
 COMMENT ON COLUMN route_price_insights.low_price_threshold IS '25th percentile - prices below this are good deals';
 COMMENT ON COLUMN route_price_insights.data_quality IS 'high: 30+ samples, medium: 14-29 samples, low: 7-13 samples';
 
+-- ============================================================================
+-- SENT DEALS TRACKING TABLE
+-- Track which routes have been sent to users and when
+-- Prevents sending the same deal too frequently
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS sent_deals (
+    id SERIAL PRIMARY KEY,
+    
+    -- Route identification
+    origin VARCHAR(3) NOT NULL,
+    destination VARCHAR(3) NOT NULL,
+    
+    -- Deal details when sent
+    price INTEGER NOT NULL,
+    outbound_date DATE NOT NULL,
+    return_date DATE NOT NULL,
+    
+    -- Tracking
+    sent_at TIMESTAMP DEFAULT NOW(),
+    recipient_email VARCHAR(255),
+    
+    -- Reference to original deal (optional)
+    deal_id INTEGER REFERENCES expanded_deals(id)
+);
+
+-- Indexes for cooldown checks
+CREATE INDEX IF NOT EXISTS idx_sent_deals_route ON sent_deals(origin, destination);
+CREATE INDEX IF NOT EXISTS idx_sent_deals_sent_at ON sent_deals(sent_at);
+CREATE INDEX IF NOT EXISTS idx_sent_deals_route_time ON sent_deals(origin, destination, sent_at);
+
+-- Comments
+COMMENT ON TABLE sent_deals IS 'Tracks which deals have been sent to prevent duplicate notifications';
+COMMENT ON COLUMN sent_deals.sent_at IS 'When the deal was sent to users';
+
