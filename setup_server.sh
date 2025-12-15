@@ -162,7 +162,8 @@ echo "DB_NAME=flight_deals"
 echo "DB_USER=flight_user"
 echo "DB_PASSWORD=$DB_PASSWORD"
 echo ""
-read -p "Press Enter to continue..."
+# Auto-continue in non-interactive mode
+sleep 2
 
 ###############################################################################
 # Step 7: Install Python Dependencies
