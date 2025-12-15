@@ -146,3 +146,4 @@ echo "  0 8 * * * cd $(pwd) && ./run_daily_pipeline.sh >> /tmp/flight_deals.log 
 echo ""
 
 
+

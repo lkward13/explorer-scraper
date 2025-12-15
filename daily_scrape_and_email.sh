@@ -99,3 +99,4 @@ echo "Sent $DEAL_COUNT deals to $RECIPIENT_EMAIL"
 echo "=========================================="
 
 
+

@@ -341,3 +341,4 @@ cd "/Users/lukeward/Documents/Coding Projects/Explorer Scraper"
 Let me know if you want me to create the automation script!
 
 
+
