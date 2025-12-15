@@ -15,6 +15,11 @@
 
 set -e  # Exit on error
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 # Colors
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
