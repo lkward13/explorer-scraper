@@ -126,7 +126,12 @@ echo ""
 if [ "$DRY_RUN" = true ]; then
     python3 send_test_email.py --num-deals "$NUM_DEALS" --min-quality "$MIN_QUALITY" --dry-run
 else
-    python3 send_test_email.py --num-deals "$NUM_DEALS" --min-quality "$MIN_QUALITY"
+    # Use SendGrid if API key is available (for DigitalOcean where SMTP is blocked)
+    if [ -n "$SENDGRID_API_KEY" ]; then
+        python3 send_daily_deals_sendgrid.py --num-deals "$NUM_DEALS" --min-quality "$MIN_QUALITY"
+    else
+        python3 send_test_email.py --num-deals "$NUM_DEALS" --min-quality "$MIN_QUALITY"
+    fi
 fi
 
 echo ""

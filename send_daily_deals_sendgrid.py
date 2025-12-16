@@ -123,7 +123,10 @@ def send_daily_deals(
     # 2. Build email
     print("[2/3] Building email...")
     builder = EmailBuilder()
-    subject, html, text = builder.build_digest_email(deals)
+    email = builder.build_digest_email(deals)
+    subject = email['subject']
+    html = email['html']
+    text = email['text']
     print(f"  ✅ Built email: {subject}")
     print()
     
