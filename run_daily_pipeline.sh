@@ -87,12 +87,11 @@ if [ "$SKIP_SCRAPE" = false ]; then
         
         docker run --rm \
           -e DISPLAY=:99 \
-          -e DB_HOST=localhost \
+          -e DB_HOST=host.docker.internal \
           -e DB_PORT=5432 \
           -e DB_NAME=flight_deals \
           -e DB_USER="${DB_USER}" \
           -e DB_PASSWORD="${DB_PASSWORD}" \
-          --network host \
           explorer-scraper python3 -u test_100_origins_v2.py
         
         echo ""
