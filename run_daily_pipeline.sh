@@ -81,11 +81,22 @@ if [ "$SKIP_SCRAPE" = false ]; then
     
     # Check if Docker is available
     if command -v docker &> /dev/null; then
-        echo "Running scraper in Docker..."
-        # Run your scraper (adjust this to your actual scraper command)
-        # For now, we'll skip this since it takes a while
-        echo -e "${YELLOW}⚠️  Skipping actual scrape for quick test${NC}"
-        echo "   In production, this would run: docker run ... test_100_origins_v2.py"
+        echo "Running 100-origin scrape in Docker..."
+        echo "Expected duration: ~3.5-4 hours"
+        echo ""
+        
+        docker run --rm \
+          -e DISPLAY=:99 \
+          -e DB_HOST=localhost \
+          -e DB_PORT=5432 \
+          -e DB_NAME=flight_deals \
+          -e DB_USER="${DB_USER}" \
+          -e DB_PASSWORD="${DB_PASSWORD}" \
+          --network host \
+          explorer-scraper python3 -u test_100_origins_v2.py
+        
+        echo ""
+        echo "✅ Scrape complete!"
     else
         echo -e "${YELLOW}⚠️  Docker not found, skipping scrape${NC}"
     fi
